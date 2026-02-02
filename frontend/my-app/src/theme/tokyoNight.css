@@ -1,0 +1,63 @@
+/* Tokyo Night Theme Variables */
+:root {
+  /* Background Colors */
+  --bg-primary: #1a1b26;
+  --bg-secondary: #16161e;
+  --bg-sidebar: #16161e;
+  --bg-hover: #24283b;
+  --bg-active: #292e42;
+  --bg-statusbar: #16161e;
+  --bg-menu: #16161e;
+  --bg-terminal: #1a1b26;
+  --bg-tab: #1a1b26;
+  --bg-tab-active: #24283b;
+  --bg-input: #1f2335;
+  
+  /* Text Colors */
+  --text-primary: #c0caf5;
+  --text-secondary: #7aa2f7;
+  --text-muted: #565f89;
+  --text-bright: #ffffff;
+  --text-warning: #ff9e64;
+  --text-error: #f7768e;
+  --text-success: #9ece6a;
+  --text-info: #7dcfff;
+  
+  /* Accent Colors */
+  --accent-blue: #7aa2f7;
+  --accent-cyan: #7dcfff;
+  --accent-green: #9ece6a;
+  --accent-magenta: #bb9af7;
+  --accent-orange: #ff9e64;
+  --accent-red: #f7768e;
+  --accent-yellow: #e0af68;
+  --accent-purple: #9d7cd8;
+  
+  /* Border Colors */
+  --border-primary: #292e42;
+  --border-secondary: #1f2335;
+  --border-highlight: #3d59a1;
+  
+  /* File State Colors */
+  --file-saved: var(--text-primary);
+  --file-modified: var(--accent-orange);
+  --file-unsaved: var(--accent-cyan);
+  --file-error: var(--accent-red);
+  
+  /* Button Colors */
+  --btn-primary: #7aa2f7;
+  --btn-primary-hover: #9ab8f7;
+  --btn-success: #9ece6a;
+  --btn-success-hover: #b4e88a;
+  --btn-danger: #f7768e;
+  
+  /* Scrollbar */
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: #444b6a;
+  --scrollbar-thumb-hover: #565f89;
+  
+  /* Shadow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.7);
+}

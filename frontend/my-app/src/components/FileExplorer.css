@@ -1,0 +1,251 @@
+.file-explorer {
+  width: 280px;
+  height: 100%;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.2s;
+}
+
+.file-explorer.collapsed {
+  width: 48px;
+}
+
+.explorer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-primary);
+  height: 35px;
+}
+
+.explorer-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.collapse-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.collapse-btn:hover {
+  color: var(--text-primary);
+}
+
+.explorer-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+  border-radius: 3px;
+  transition: background-color 0.1s;
+}
+
+.icon-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.explorer-section {
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-header:hover {
+  background-color: var(--bg-hover);
+}
+
+.section-arrow {
+  font-size: 8px;
+}
+
+.section-title {
+  flex: 1;
+}
+
+.section-badge {
+  background-color: var(--bg-active);
+  color: var(--text-muted);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+}
+
+.file-list {
+  padding: 4px 0;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 24px;
+  font-size: 13px;
+  color: var(--file-saved);
+  cursor: pointer;
+  transition: background-color 0.1s;
+  position: relative;
+}
+
+.file-item:hover {
+  background-color: var(--bg-hover);
+}
+
+.file-item.active {
+  background-color: var(--bg-active);
+  color: var(--text-bright);
+}
+
+.file-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--accent-blue);
+}
+
+.file-item.modified .file-name {
+  color: var(--file-modified);
+  font-style: italic;
+}
+
+.file-item.unsaved .file-name {
+  color: var(--file-unsaved);
+}
+
+.file-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-indicator {
+  color: var(--accent-orange);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.quick-actions {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-blue);
+}
+
+.action-icon {
+  font-size: 16px;
+}
+
+.explorer-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-message {
+  font-size: 12px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.primary-btn,
+.secondary-btn {
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+
+.primary-btn {
+  background-color: var(--btn-primary);
+  border: none;
+  color: white;
+}
+
+.primary-btn:hover {
+  background-color: var(--btn-primary-hover);
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+.secondary-btn:hover {
+  background-color: var(--bg-hover);
+}
+
+/* Collapsed state */
+.file-explorer.collapsed .explorer-header span,
+.file-explorer.collapsed .explorer-section,
+.file-explorer.collapsed .explorer-actions {
+  display: none;
+}
+
+.file-explorer.collapsed .collapse-btn {
+  margin: 0 auto;
+}
