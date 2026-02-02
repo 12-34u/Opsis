@@ -1,0 +1,162 @@
+.register-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.register-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.register-section h3 {
+  margin: 0;
+  color: var(--accent-blue);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.register-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.register-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px;
+  transition: all 0.2s ease;
+}
+
+.register-item:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 8px rgba(122, 162, 247, 0.2);
+}
+
+.register-name {
+  color: var(--accent-cyan);
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+.register-value {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.register-value .hex {
+  color: var(--accent-orange);
+  font-size: 11px;
+}
+
+.register-value .dec {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.register-value .bin {
+  color: var(--accent-green);
+  font-size: 10px;
+}
+
+.flags-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 8px;
+}
+
+.flag-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.flag-item.set {
+  background: rgba(156, 206, 106, 0.1);
+  border-color: var(--accent-green);
+}
+
+.flag-item.clear {
+  background: rgba(247, 118, 142, 0.05);
+  border-color: rgba(247, 118, 142, 0.3);
+}
+
+.flag-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.flag-value {
+  color: var(--accent-green);
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.flag-item.clear .flag-value {
+  color: var(--text-secondary);
+}
+
+.pointer-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.pointer-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pointer-name {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.pointer-value {
+  color: var(--accent-blue);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.register-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.register-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.register-panel::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.register-panel::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}

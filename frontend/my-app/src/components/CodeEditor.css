@@ -30,6 +30,25 @@
   background-color: var(--bg-primary);
 }
 
+/* Assembly Panels */
+.assembly-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 8px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.panel-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 10px;

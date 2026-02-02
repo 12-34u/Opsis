@@ -1,8 +1,10 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
+const Assembler8085 = require('../../backend/assembler');
 
 let mainWindow;
+const assembler = new Assembler8085();
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -56,6 +58,7 @@ ipcMain.handle('open-file', async () => {
     properties: ['openFile'],
     filters: [
       { name: 'All Files', extensions: ['*'] },
+      { name: 'Assembly (8085/8086)', extensions: ['asm', 'asm85', 'asm86', 's'] },
       { name: 'JavaScript', extensions: ['js', 'jsx'] },
       { name: 'TypeScript', extensions: ['ts', 'tsx'] },
       { name: 'Python', extensions: ['py'] },
@@ -93,6 +96,7 @@ ipcMain.handle('save-file-as', async (event, { content }) => {
   const result = await dialog.showSaveDialog(mainWindow, {
     filters: [
       { name: 'All Files', extensions: ['*'] },
+      { name: 'Assembly (8085/8086)', extensions: ['asm', 'asm85', 'asm86'] },
       { name: 'JavaScript', extensions: ['js'] },
       { name: 'TypeScript', extensions: ['ts'] },
       { name: 'Python', extensions: ['py'] },
@@ -117,6 +121,20 @@ ipcMain.handle('save-file-as', async (event, { content }) => {
 });
 
 ipcMain.handle('execute-code', async (event, { code, language }) => {
+  // Assembly execution
+  if (language === 'assembly' || language === 'asm') {
+    try {
+      const result = assembler.execute(code);
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  // Original language execution for backward compatibility
   const { exec } = require('child_process');
   const util = require('util');
   const execPromise = util.promisify(exec);
@@ -161,6 +179,58 @@ ipcMain.handle('execute-code', async (event, { code, language }) => {
       error: error.message,
       output: error.stdout || '',
       stderr: error.stderr || ''
+    };
+  }
+});
+
+// Assembler IPC Handlers
+ipcMain.handle('assembler:reset', async (event) => {
+  assembler.reset();
+  return {
+    success: true,
+    state: assembler.getState(),
+  };
+});
+
+ipcMain.handle('assembler:getState', async (event) => {
+  return assembler.getState();
+});
+
+ipcMain.handle('assembler:setRegister', async (event, register, value) => {
+  try {
+    assembler.setRegisterValue(register, value);
+    return {
+      success: true,
+      state: assembler.getState(),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+});
+
+ipcMain.handle('assembler:getMemory', async (event, start = 0, length = 256) => {
+  const memory = assembler.memory.slice(start, start + length);
+  return {
+    success: true,
+    memory,
+    start,
+  };
+});
+
+ipcMain.handle('assembler:setMemory', async (event, address, value) => {
+  try {
+    assembler.memory[address] = value & 0xFF;
+    return {
+      success: true,
+      state: assembler.getState(),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
     };
   }
 });

@@ -1,0 +1,178 @@
+.memory-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.memory-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.memory-header h3 {
+  margin: 0;
+  color: var(--accent-blue);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.memory-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.scroll-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scroll-btn:hover {
+  background: var(--bg-primary);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.addr-input {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 6px 8px;
+  border-radius: 4px;
+  width: 80px;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+  transition: all 0.2s ease;
+}
+
+.addr-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 8px rgba(122, 162, 247, 0.2);
+}
+
+.memory-table {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.memory-row {
+  display: flex;
+  gap: 8px;
+  padding: 4px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.memory-row:last-child {
+  border-bottom: none;
+}
+
+.memory-row.header {
+  background: rgba(122, 162, 247, 0.1);
+  padding: 8px;
+}
+
+.addr-col {
+  color: var(--accent-cyan);
+  font-weight: 600;
+  width: 50px;
+  text-align: right;
+}
+
+.values-row {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 2px;
+  flex: 1;
+}
+
+.cell-header {
+  color: var(--text-secondary);
+  text-align: center;
+  font-weight: 500;
+  padding: 2px;
+  font-size: 10px;
+}
+
+.memory-cell {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 3px;
+  text-align: center;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.memory-cell.zero {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.memory-cell.populated {
+  background: rgba(156, 206, 106, 0.1);
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+
+.memory-cell.empty {
+  color: var(--text-secondary);
+  opacity: 0.3;
+}
+
+.memory-footer {
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.memory-info {
+  display: inline-block;
+}
+
+.memory-viewer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.memory-viewer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.memory-viewer::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.memory-viewer::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}
