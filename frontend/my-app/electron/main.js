@@ -1,7 +1,10 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
-const Assembler8085 = require('../../backend/assembler');
+
+// Get the Opsis root directory
+const opsisRoot = path.resolve(__dirname, '../../..');
+const Assembler8085 = require(path.join(opsisRoot, 'backend/assembler'));
 
 let mainWindow;
 const assembler = new Assembler8085();

@@ -2,7 +2,8 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs").promises;
-const Assembler8085 = require("../../backend/assembler");
+const opsisRoot = path.resolve(__dirname, "../../..");
+const Assembler8085 = require(path.join(opsisRoot, "backend/assembler"));
 let mainWindow;
 const assembler = new Assembler8085();
 function createWindow() {
