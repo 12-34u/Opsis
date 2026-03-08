@@ -1,8 +1,1 @@
-"use strict";
-const { contextBridge, ipcRenderer } = require("electron");
-contextBridge.exposeInMainWorld("electronAPI", {
-  openFile: () => ipcRenderer.invoke("open-file"),
-  saveFile: (data) => ipcRenderer.invoke("save-file", data),
-  saveFileAs: (data) => ipcRenderer.invoke("save-file-as", data),
-  executeCode: (data) => ipcRenderer.invoke("execute-code", data)
-});
+"use strict";const{contextBridge:o,ipcRenderer:i}=require("electron");o.exposeInMainWorld("electronAPI",{openFile:()=>i.invoke("open-file"),saveFile:e=>i.invoke("save-file",e),saveFileAs:e=>i.invoke("save-file-as",e),executeCode:e=>i.invoke("execute-code",e)});

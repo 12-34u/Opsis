@@ -45,15 +45,40 @@
 }
 
 /* Assembly Panels */
-.assembly-panels {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  padding: 8px;
+.panel-resize-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 6px;
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-color);
-  max-height: 300px;
-  overflow-y: auto;
+  cursor: ns-resize;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.panel-resize-handle:hover,
+.panel-resize-handle:active {
+  background: rgba(122, 162, 247, 0.15);
+}
+
+.resize-grip {
+  width: 36px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--border-color);
+  transition: background 0.15s;
+}
+
+.panel-resize-handle:hover .resize-grip {
+  background: var(--accent-blue);
+}
+
+.assembly-panels {
+  display: flex;
+  background: var(--bg-secondary);
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 .panel-container {

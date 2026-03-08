@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
 import MenuBar from './MenuBar';
 import Sidebar from './Sidebar';
@@ -6,8 +6,6 @@ import FileExplorer from './FileExplorer';
 import FileTabs from './FileTabs';
 import BottomPanel from './BottomPanel';
 import StatusBar from './StatusBar';
-import RegisterPanel from './RegisterPanel';
-import MemoryViewer from './MemoryViewer';
 import OutputPanel from './OutputPanel';
 import './CodeEditor.css';
 import '../theme/tokyoNight.css';
@@ -41,9 +39,46 @@ HLT              ; Halt execution`,
   const [executionOutput, setExecutionOutput] = useState([]);
   const [executionError, setExecutionError] = useState(null);
   const [instructionCount, setInstructionCount] = useState(0);
+  const [executionSteps, setExecutionSteps] = useState([]);
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
   const errorDecorationIdsRef = useRef([]);
+  const [panelHeight, setPanelHeight] = useState(300);
+  const isDraggingRef = useRef(false);
+  const dragStartYRef = useRef(0);
+  const dragStartHeightRef = useRef(0);
+
+  // Panel resize handlers
+  const handlePanelDragStart = useCallback((e) => {
+    e.preventDefault();
+    isDraggingRef.current = true;
+    dragStartYRef.current = e.clientY;
+    dragStartHeightRef.current = panelHeight;
+    document.body.style.cursor = 'ns-resize';
+    document.body.style.userSelect = 'none';
+  }, [panelHeight]);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isDraggingRef.current) return;
+      const delta = dragStartYRef.current - e.clientY;
+      const newHeight = Math.max(100, Math.min(window.innerHeight * 0.7, dragStartHeightRef.current + delta));
+      setPanelHeight(newHeight);
+    };
+    const handleMouseUp = () => {
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
 
   const currentFile = openFiles[activeFileIndex];
 
@@ -241,6 +276,7 @@ HLT`,
     setOutput('⏳ Assembling and executing...\n');
     setExecutionError(null);
     setExecutionOutput([]);
+    setExecutionSteps([]);
     clearExecutionHighlights();
     
     try {
@@ -252,6 +288,7 @@ HLT`,
       if (result.success) {
         setAssemblerState(result.state);
         setExecutionOutput(result.output || []);
+        setExecutionSteps(result.steps || []);
         setInstructionCount(result.instructionCount || 0);
         setExecutionError(null);
         clearExecutionHighlights();
@@ -331,7 +368,31 @@ HLT`,
         column: e.position.column
       });
     });
+
+    // Override Ctrl+S in Monaco to prevent browser save dialog
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+      handleSaveFile();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyS, () => {
+      handleSaveFileAs();
+    });
   };
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleSaveFileAs();
+        } else {
+          handleSaveFile();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [openFiles, activeFileIndex]);
 
   return (
     <div className="vscode-container">
@@ -403,21 +464,18 @@ HLT`,
           </div>
           
           {/* Assembly-specific panels */}
-          <div className="assembly-panels">
-            <div className="panel-container">
-              <RegisterPanel state={assemblerState} />
-            </div>
-            <div className="panel-container">
-              <MemoryViewer memory={assemblerState?.memory || []} />
-            </div>
-            <div className="panel-container">
-              <OutputPanel 
-                output={executionOutput}
-                error={executionError}
-                instructionCount={instructionCount}
-                isRunning={isRunning}
-              />
-            </div>
+          <div className="panel-resize-handle" onMouseDown={handlePanelDragStart}>
+            <div className="resize-grip" />
+          </div>
+          <div className="assembly-panels" style={{ height: panelHeight }}>
+            <OutputPanel 
+              output={executionOutput}
+              error={executionError}
+              instructionCount={instructionCount}
+              isRunning={isRunning}
+              steps={executionSteps}
+              assemblerState={assemblerState}
+            />
           </div>
         </div>
       </div>
