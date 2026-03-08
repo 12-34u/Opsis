@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, session } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
 
@@ -8,6 +8,57 @@ const Assembler8085 = require(path.join(opsisRoot, 'backend/assembler'));
 
 let mainWindow;
 const assembler = new Assembler8085();
+
+function configureContentSecurityPolicy() {
+  const devServerUrl = process.env.VITE_DEV_SERVER_URL;
+  const devOrigin = devServerUrl ? new URL(devServerUrl).origin : null;
+  const devWsOrigin = devOrigin ? devOrigin.replace('http://', 'ws://').replace('https://', 'wss://') : null;
+  const monacoCdnOrigin = 'https://cdn.jsdelivr.net';
+
+  const scriptSrc = ["'self'", monacoCdnOrigin];
+  const styleSrc = ["'self'", "'unsafe-inline'", monacoCdnOrigin];
+  const connectSrc = ["'self'", monacoCdnOrigin];
+  const imgSrc = ["'self'", 'data:', 'blob:'];
+  const fontSrc = ["'self'", 'data:'];
+  const workerSrc = ["'self'", 'blob:'];
+
+  if (devOrigin) {
+    // Vite/React dev injects a small inline preamble script.
+    scriptSrc.push("'unsafe-inline'");
+    scriptSrc.push(devOrigin);
+    styleSrc.push(devOrigin);
+    connectSrc.push(devOrigin);
+    imgSrc.push(devOrigin);
+    fontSrc.push(devOrigin);
+  }
+
+  if (devWsOrigin) {
+    connectSrc.push(devWsOrigin);
+  }
+
+  const csp = [
+    `default-src 'self'${devOrigin ? ` ${devOrigin}` : ''}`,
+    `script-src ${scriptSrc.join(' ')}`,
+    `style-src ${styleSrc.join(' ')}`,
+    `connect-src ${connectSrc.join(' ')}`,
+    `img-src ${imgSrc.join(' ')}`,
+    `font-src ${fontSrc.join(' ')}`,
+    `worker-src ${workerSrc.join(' ')}`,
+    `child-src ${workerSrc.join(' ')}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    "frame-ancestors 'none'",
+  ].join('; ');
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [csp],
+      },
+    });
+  });
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -29,7 +80,7 @@ function createWindow() {
   // Load the app
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools(); // Uncomment for debugging
   } else {
     mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
   }
@@ -40,6 +91,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  configureContentSecurityPolicy();
   createWindow();
 
   app.on('activate', () => {
