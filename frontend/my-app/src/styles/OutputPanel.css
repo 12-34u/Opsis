@@ -77,6 +77,14 @@
   color: var(--text-primary);
   font-size: 11px;
   word-break: break-word;
+  white-space: pre-wrap;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.error-line {
+  color: var(--text-primary);
 }
 
 .output-empty {
@@ -115,6 +123,16 @@
   box-shadow: 0 0 8px rgba(122, 162, 247, 0.15);
 }
 
+.output-item-error {
+  border-color: var(--accent-red);
+  background: rgba(247, 118, 142, 0.08);
+}
+
+.output-item-error:hover {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 8px rgba(247, 118, 142, 0.25);
+}
+
 .output-index {
   color: var(--text-secondary);
   font-size: 10px;
@@ -135,6 +153,10 @@
   color: var(--accent-cyan);
   font-weight: 600;
   font-size: 11px;
+}
+
+.output-type-error {
+  color: var(--accent-red);
 }
 
 .output-values {
@@ -164,6 +186,16 @@
 .output-values .bin {
   color: var(--accent-green);
   border: 1px solid rgba(156, 206, 106, 0.3);
+}
+
+.output-values-error {
+  gap: 6px;
+}
+
+.output-values .err {
+  color: var(--accent-red);
+  border: 1px solid rgba(247, 118, 142, 0.4);
+  background: rgba(247, 118, 142, 0.12);
 }
 
 .output-panel::-webkit-scrollbar {

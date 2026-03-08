@@ -30,6 +30,20 @@
   background-color: var(--bg-primary);
 }
 
+.execution-error-line {
+  background: rgba(247, 118, 142, 0.18);
+  border-left: 3px solid var(--accent-red);
+}
+
+.execution-error-glyph {
+  background: var(--accent-red);
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  margin-left: 6px;
+  margin-top: 6px;
+}
+
 /* Assembly Panels */
 .assembly-panels {
   display: grid;

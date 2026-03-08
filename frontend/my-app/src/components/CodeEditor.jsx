@@ -42,6 +42,8 @@ HLT              ; Halt execution`,
   const [executionError, setExecutionError] = useState(null);
   const [instructionCount, setInstructionCount] = useState(0);
   const editorRef = useRef(null);
+  const monacoRef = useRef(null);
+  const errorDecorationIdsRef = useRef([]);
 
   const currentFile = openFiles[activeFileIndex];
 
@@ -174,7 +176,58 @@ HLT`,
     setOpenFiles(newFiles);
   };
 
+  const clearExecutionHighlights = () => {
+    if (!editorRef.current || !monacoRef.current) return;
+
+    const model = editorRef.current.getModel();
+    if (!model) return;
+
+    monacoRef.current.editor.setModelMarkers(model, 'assembly-execution', []);
+    errorDecorationIdsRef.current = editorRef.current.deltaDecorations(
+      errorDecorationIdsRef.current,
+      []
+    );
+  };
+
+  const highlightExecutionError = (lineNumber, message) => {
+    if (!editorRef.current || !monacoRef.current || !lineNumber) return;
+
+    const model = editorRef.current.getModel();
+    if (!model) return;
+
+    const safeLine = Math.max(1, Math.min(lineNumber, model.getLineCount()));
+    const endColumn = model.getLineMaxColumn(safeLine);
+
+    monacoRef.current.editor.setModelMarkers(model, 'assembly-execution', [
+      {
+        startLineNumber: safeLine,
+        startColumn: 1,
+        endLineNumber: safeLine,
+        endColumn,
+        message,
+        severity: monacoRef.current.MarkerSeverity.Error,
+      },
+    ]);
+
+    errorDecorationIdsRef.current = editorRef.current.deltaDecorations(
+      errorDecorationIdsRef.current,
+      [
+        {
+          range: new monacoRef.current.Range(safeLine, 1, safeLine, endColumn),
+          options: {
+            isWholeLine: true,
+            className: 'execution-error-line',
+            glyphMarginClassName: 'execution-error-glyph',
+          },
+        },
+      ]
+    );
+
+    editorRef.current.revealLineInCenter(safeLine);
+  };
+
   const handleCodeChange = (value) => {
+    clearExecutionHighlights();
     updateCurrentFile({ 
       content: value || '', 
       isModified: true 
@@ -188,6 +241,7 @@ HLT`,
     setOutput('⏳ Assembling and executing...\n');
     setExecutionError(null);
     setExecutionOutput([]);
+    clearExecutionHighlights();
     
     try {
       const result = await window.electronAPI.executeCode({ 
@@ -200,18 +254,39 @@ HLT`,
         setExecutionOutput(result.output || []);
         setInstructionCount(result.instructionCount || 0);
         setExecutionError(null);
+        clearExecutionHighlights();
         
         let outputText = '✅ Assembly execution completed!\n\n';
         outputText += `Instructions executed: ${result.instructionCount}\n`;
         outputText += `Output items: ${result.output?.length || 0}\n`;
         setOutput(outputText);
       } else {
-        setExecutionError(result.error);
-        setOutput('❌ Assembly execution failed!');
+        const details = result.errorDetails || {};
+        const errorLines = ['❌ Assembly execution failed!'];
+
+        if (details.line !== undefined && details.line !== null) {
+          errorLines.push(`Line: ${details.line}`);
+        }
+        if (details.instruction) {
+          errorLines.push(`Instruction: ${details.instruction}`);
+        }
+        if (result.error) {
+          errorLines.push(`Reason: ${result.error}`);
+        }
+
+        const formattedError = errorLines.join('\n');
+        setExecutionError(formattedError);
+        setOutput(formattedError);
+        setInstructionCount(result.instructionCount || 0);
+
+        if (details.line !== undefined && details.line !== null) {
+          highlightExecutionError(details.line, formattedError);
+        }
       }
     } catch (error) {
       setExecutionError(error.message);
       setOutput('❌ Error: ' + error.message);
+      clearExecutionHighlights();
     } finally {
       setIsRunning(false);
     }
@@ -247,8 +322,9 @@ HLT`,
   };
 
   // Editor events
-  const handleEditorDidMount = (editor) => {
+  const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
+    monacoRef.current = monaco;
     editor.onDidChangeCursorPosition((e) => {
       setCursorPosition({
         line: e.position.lineNumber,

@@ -4,9 +4,9 @@
  */
 
 const { ipcMain } = require('electron');
-const Assembler8085 = require('./assembler');
+const Assembler8086Bridge = require('./assembler');
 
-const assembler = new Assembler8085();
+const assembler = new Assembler8086Bridge();
 
 function initializeAssemblerHandlers() {
   /**
@@ -82,12 +82,19 @@ function initializeAssemblerHandlers() {
    * Get memory
    */
   ipcMain.handle('assembler:getMemory', async (event, start = 0, length = 256) => {
-    const memory = assembler.memory.slice(start, start + length);
-    return {
-      success: true,
-      memory,
-      start,
-    };
+    try {
+      const memory = assembler.getMemory(start, length);
+      return {
+        success: true,
+        memory,
+        start,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   });
 
   /**
@@ -95,7 +102,7 @@ function initializeAssemblerHandlers() {
    */
   ipcMain.handle('assembler:setMemory', async (event, address, value) => {
     try {
-      assembler.memory[address] = value & 0xFF;
+      assembler.setMemoryValue(address, value);
       return {
         success: true,
         state: assembler.getState(),

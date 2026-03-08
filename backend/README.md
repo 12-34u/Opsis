@@ -1,11 +1,11 @@
 # Opsis Assembly Assembler IDE
 
-An educational 8085/8086 assembly language assembler and interpreter built into Opsis Code Editor.
+An educational 8086-focused assembly language assembler and interpreter built into Opsis Code Editor.
 
 ## Features
 
 ### Assembler Support
-- **8085 Microprocessor** - Primary architecture (with 8086 as addon)
+- **8086 Microprocessor** - Primary architecture
 - **Complete Instruction Set**:
   - Data Movement: MOV, MVI, LDA, STA
   - Arithmetic: ADD, ADI, SUB, SUI, MUL, DIV, INR, DCR
@@ -13,8 +13,8 @@ An educational 8085/8086 assembly language assembler and interpreter built into 
   - I/O & Control: OUT, HLT, NOP
 
 ### Execution Engine
-- **Real-time Assembly Interpretation** - No external assembler needed
-- **Register State Display** - View all 7 registers (A, B, C, D, E, H, L)
+- **Python-backed Assembly Interpretation** - Electron invokes a Python 8086 engine
+- **Register State Display** - View key 8086 registers (AX, BX, CX, DX, SI, DI, BP, SP, IP)
 - **Flag Visualization** - Zero, Carry, Parity, Sign flags
 - **Memory Inspector** - Hexadecimal memory dump with navigation
 - **Output Panel** - View execution results in Hex/Decimal/Binary
@@ -160,7 +160,7 @@ DIV B            ; ERROR: Cannot divide by zero
 Solution: Ensure divisor is not zero
 
 ### "Invalid register" Error
-Check register names are valid: A, B, C, D, E, H, L (case-insensitive)
+Check register names are valid: AX, BX, CX, DX, SI, DI, BP, SP, IP (case-insensitive)
 
 ### "Unknown instruction" Error
 Verify instruction spelling and format. See Instruction Reference above.
