@@ -162,12 +162,24 @@ class Assembler8086:
             dst, imm = [x.strip() for x in operands.split(",", 1)]
             self.set_register(dst, self.parse_value(imm))
         elif opcode == "ADD":
-            dst, src = self.parse_two_operands(operands)
+            if "," in operands:
+                dst, src = self.parse_two_operands(operands)
+            else:
+                dst, src = "A", operands.strip(
+                dst, src = self.parse_two_operands(operands)
+            else:
+                dst, src = "A", operands.strip()
             value = (self.resolve_operand(dst) + self.resolve_operand(src)) & 0xFFFF
-            self.set_register(dst, value)
+            if "," in operands:
+                dst, src = self.parse_two_operands(operands)
+            else:
+                dst, src = "A", operands.strip(
             self.set_flags(value)
         elif opcode == "SUB":
-            dst, src = self.parse_two_operands(operands)
+            if "," in operands:
+                dst, src = self.parse_two_operands(operands)
+            else:
+                dst, src = "A", operands.strip()
             value = (self.resolve_operand(dst) - self.resolve_operand(src)) & 0xFFFF
             self.set_register(dst, value)
             self.set_flags(value)
@@ -176,13 +188,19 @@ class Assembler8086:
             value = (self.resolve_operand(reg) + 1) & 0xFFFF
             self.set_register(reg, value)
             self.set_flags(value)
-        elif opcode == "DEC":
+        elifif "," in operands:
+                left, right = self.parse_two_operands(operands)
+            else:
+                left, right = "A", operands.strip(
             reg = operands.strip()
             value = (self.resolve_operand(reg) - 1) & 0xFFFF
             self.set_register(reg, value)
             self.set_flags(value)
         elif opcode == "CMP":
-            left, right = self.parse_two_operands(operands)
+            if "," in operands:
+                left, right = self.parse_two_operands(operands)
+            else:
+                left, right = "A", operands.strip()
             value = (self.resolve_operand(left) - self.resolve_operand(right)) & 0xFFFF
             self.set_flags(value)
         elif opcode == "JMP":
