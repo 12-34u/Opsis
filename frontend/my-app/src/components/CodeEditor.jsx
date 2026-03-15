@@ -43,6 +43,8 @@ HLT              ; Halt execution`,
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
   const errorDecorationIdsRef = useRef([]);
+  const saveFileRef = useRef(null);
+  const saveFileAsRef = useRef(null);
   const [panelHeight, setPanelHeight] = useState(300);
   const isDraggingRef = useRef(false);
   const dragStartYRef = useRef(0);
@@ -173,6 +175,10 @@ HLT              ; Halt execution`,
     }
   };
 
+  // Keep refs up to date so Monaco closures always call the latest version
+  saveFileRef.current = handleSaveFile;
+  saveFileAsRef.current = handleSaveFileAs;
+
   const handleNewFile = () => {
     const newFile = {
       name: `untitled_${Date.now()}.asm`,
@@ -295,7 +301,14 @@ HLT`,
         
         let outputText = '✅ Assembly execution completed!\n\n';
         outputText += `Instructions executed: ${result.instructionCount}\n`;
-        outputText += `Output items: ${result.output?.length || 0}\n`;
+        if (result.output && result.output.length > 0) {
+          outputText += `\nProgram Output:\n`;
+          result.output.forEach((item, idx) => {
+            outputText += `  ${item.decimal != null ? item.decimal : item.value}`;
+            if (item.hex) outputText += `  (${item.hex})`;
+            outputText += `\n`;
+          });
+        }
         setOutput(outputText);
       } else {
         const details = result.errorDetails || {};
@@ -371,10 +384,10 @@ HLT`,
 
     // Override Ctrl+S in Monaco to prevent browser save dialog
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-      handleSaveFile();
+      saveFileRef.current?.();
     });
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyS, () => {
-      handleSaveFileAs();
+      saveFileAsRef.current?.();
     });
   };
 

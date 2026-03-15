@@ -1,1 +1,253 @@
-"use strict";const{app:m,BrowserWindow:v,ipcMain:c,dialog:j,session:g}=require("electron"),o=require("path"),u=require("fs").promises,S=o.resolve(__dirname,"../../.."),$=require(o.join(S,"backend/assembler"));let l;const i=new $;function _(){const n=process.env.VITE_DEV_SERVER_URL,e=n?new URL(n).origin:null,s=e?e.replace("http://","ws://").replace("https://","wss://"):null,r="https://cdn.jsdelivr.net",p=["'self'",r],d=["'self'","'unsafe-inline'",r],t=["'self'",r],a=["'self'","data:","blob:"],h=["'self'","data:"],f=["'self'","blob:"];e&&(p.push("'unsafe-inline'"),p.push(e),d.push(e),t.push(e),a.push(e),h.push(e)),s&&t.push(s);const y=[`default-src 'self'${e?` ${e}`:""}`,`script-src ${p.join(" ")}`,`style-src ${d.join(" ")}`,`connect-src ${t.join(" ")}`,`img-src ${a.join(" ")}`,`font-src ${h.join(" ")}`,`worker-src ${f.join(" ")}`,`child-src ${f.join(" ")}`,"object-src 'none'","base-uri 'self'","frame-ancestors 'none'"].join("; ");g.defaultSession.webRequest.onHeadersReceived((x,b)=>{b({responseHeaders:{...x.responseHeaders,"Content-Security-Policy":[y]}})})}function w(){l=new v({width:1400,height:900,minWidth:800,minHeight:600,frame:!0,backgroundColor:"#1e1e1e",webPreferences:{preload:o.join(__dirname,"preload.js"),contextIsolation:!0,nodeIntegration:!1,sandbox:!1},icon:o.join(__dirname,"../public/icon.png")}),process.env.VITE_DEV_SERVER_URL?l.loadURL(process.env.VITE_DEV_SERVER_URL):l.loadFile(o.join(__dirname,"../dist/index.html")),l.on("closed",()=>{l=null})}m.whenReady().then(()=>{_(),w(),m.on("activate",()=>{v.getAllWindows().length===0&&w()})});m.on("window-all-closed",()=>{process.platform!=="darwin"&&m.quit()});c.handle("open-file",async()=>{const n=await j.showOpenDialog(l,{properties:["openFile"],filters:[{name:"All Files",extensions:["*"]},{name:"Assembly (8085/8086)",extensions:["asm","asm85","asm86","s"]},{name:"JavaScript",extensions:["js","jsx"]},{name:"TypeScript",extensions:["ts","tsx"]},{name:"Python",extensions:["py"]},{name:"Java",extensions:["java"]},{name:"C/C++",extensions:["c","cpp","h","hpp"]},{name:"HTML",extensions:["html","htm"]},{name:"CSS",extensions:["css","scss","sass"]},{name:"JSON",extensions:["json"]},{name:"Markdown",extensions:["md"]}]});if(!n.canceled&&n.filePaths.length>0){const e=n.filePaths[0],s=await u.readFile(e,"utf-8");return{path:e,content:s,name:o.basename(e)}}return null});c.handle("save-file",async(n,{path:e,content:s})=>{try{return await u.writeFile(e,s,"utf-8"),{success:!0}}catch(r){return{success:!1,error:r.message}}});c.handle("save-file-as",async(n,{content:e})=>{const s=await j.showSaveDialog(l,{filters:[{name:"All Files",extensions:["*"]},{name:"Assembly (8085/8086)",extensions:["asm","asm85","asm86"]},{name:"JavaScript",extensions:["js"]},{name:"TypeScript",extensions:["ts"]},{name:"Python",extensions:["py"]},{name:"Java",extensions:["java"]},{name:"Text",extensions:["txt"]}]});if(!s.canceled&&s.filePath)try{return await u.writeFile(s.filePath,e,"utf-8"),{success:!0,path:s.filePath,name:o.basename(s.filePath)}}catch(r){return{success:!1,error:r.message}}return{success:!1}});c.handle("execute-code",async(n,{code:e,language:s})=>{if(s==="assembly"||s==="asm")try{return i.execute(e)}catch(t){return{success:!1,error:t.message}}const{exec:r}=require("child_process"),d=require("util").promisify(r);try{let t;const a=o.join(m.getPath("temp"),`temp_code_${Date.now()}`);switch(s){case"javascript":await u.writeFile(`${a}.js`,e),t=`node "${a}.js"`;break;case"python":await u.writeFile(`${a}.py`,e),t=`python "${a}.py"`;break;case"java":const y=e.match(/class\s+(\w+)/)?.[1]||"Main";await u.writeFile(`${a}.java`,e),t=`javac "${a}.java" && java -cp "${o.dirname(a)}" ${y}`;break;default:return{success:!1,error:"Unsupported language"}}const{stdout:h,stderr:f}=await d(t);try{await u.unlink(`${a}.${s==="javascript"?"js":s==="python"?"py":"java"}`)}catch{}return{success:!0,output:h,error:f}}catch(t){return{success:!1,error:t.message,output:t.stdout||"",stderr:t.stderr||""}}});c.handle("assembler:reset",async n=>(i.reset(),{success:!0,state:i.getState()}));c.handle("assembler:getState",async n=>i.getState());c.handle("assembler:setRegister",async(n,e,s)=>{try{return i.setRegisterValue(e,s),{success:!0,state:i.getState()}}catch(r){return{success:!1,error:r.message}}});c.handle("assembler:getMemory",async(n,e=0,s=256)=>({success:!0,memory:i.memory.slice(e,e+s),start:e}));c.handle("assembler:setMemory",async(n,e,s)=>{try{return i.memory[e]=s&255,{success:!0,state:i.getState()}}catch(r){return{success:!1,error:r.message}}});
+"use strict";
+const { app, BrowserWindow, ipcMain, dialog, session } = require("electron");
+const path = require("path");
+const fs = require("fs").promises;
+const opsisRoot = path.resolve(__dirname, "../../..");
+const Assembler8085 = require(path.join(opsisRoot, "backend/assembler"));
+let mainWindow;
+const assembler = new Assembler8085();
+function configureContentSecurityPolicy() {
+  const devServerUrl = process.env.VITE_DEV_SERVER_URL;
+  const devOrigin = devServerUrl ? new URL(devServerUrl).origin : null;
+  const devWsOrigin = devOrigin ? devOrigin.replace("http://", "ws://").replace("https://", "wss://") : null;
+  const monacoCdnOrigin = "https://cdn.jsdelivr.net";
+  const scriptSrc = ["'self'", monacoCdnOrigin];
+  const styleSrc = ["'self'", "'unsafe-inline'", monacoCdnOrigin];
+  const connectSrc = ["'self'", monacoCdnOrigin];
+  const imgSrc = ["'self'", "data:", "blob:"];
+  const fontSrc = ["'self'", "data:"];
+  const workerSrc = ["'self'", "blob:"];
+  if (devOrigin) {
+    scriptSrc.push("'unsafe-inline'");
+    scriptSrc.push(devOrigin);
+    styleSrc.push(devOrigin);
+    connectSrc.push(devOrigin);
+    imgSrc.push(devOrigin);
+    fontSrc.push(devOrigin);
+  }
+  if (devWsOrigin) {
+    connectSrc.push(devWsOrigin);
+  }
+  const csp = [
+    `default-src 'self'${devOrigin ? ` ${devOrigin}` : ""}`,
+    `script-src ${scriptSrc.join(" ")}`,
+    `style-src ${styleSrc.join(" ")}`,
+    `connect-src ${connectSrc.join(" ")}`,
+    `img-src ${imgSrc.join(" ")}`,
+    `font-src ${fontSrc.join(" ")}`,
+    `worker-src ${workerSrc.join(" ")}`,
+    `child-src ${workerSrc.join(" ")}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    "frame-ancestors 'none'"
+  ].join("; ");
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        "Content-Security-Policy": [csp]
+      }
+    });
+  });
+}
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1400,
+    height: 900,
+    minWidth: 800,
+    minHeight: 600,
+    frame: true,
+    backgroundColor: "#1e1e1e",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false
+    },
+    icon: path.join(__dirname, "../public/icon.png")
+  });
+  if (process.env.VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
+  } else {
+    mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+  }
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
+}
+app.whenReady().then(() => {
+  configureContentSecurityPolicy();
+  createWindow();
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+});
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+});
+ipcMain.handle("open-file", async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ["openFile"],
+    filters: [
+      { name: "All Files", extensions: ["*"] },
+      { name: "Assembly (8085/8086)", extensions: ["asm", "asm85", "asm86", "s"] },
+      { name: "JavaScript", extensions: ["js", "jsx"] },
+      { name: "TypeScript", extensions: ["ts", "tsx"] },
+      { name: "Python", extensions: ["py"] },
+      { name: "Java", extensions: ["java"] },
+      { name: "C/C++", extensions: ["c", "cpp", "h", "hpp"] },
+      { name: "HTML", extensions: ["html", "htm"] },
+      { name: "CSS", extensions: ["css", "scss", "sass"] },
+      { name: "JSON", extensions: ["json"] },
+      { name: "Markdown", extensions: ["md"] }
+    ]
+  });
+  if (!result.canceled && result.filePaths.length > 0) {
+    const filePath = result.filePaths[0];
+    const content = await fs.readFile(filePath, "utf-8");
+    return {
+      path: filePath,
+      content,
+      name: path.basename(filePath)
+    };
+  }
+  return null;
+});
+ipcMain.handle("save-file", async (event, { path: filePath, content }) => {
+  try {
+    await fs.writeFile(filePath, content, "utf-8");
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+ipcMain.handle("save-file-as", async (event, { content }) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    filters: [
+      { name: "All Files", extensions: ["*"] },
+      { name: "Assembly (8085/8086)", extensions: ["asm", "asm85", "asm86"] },
+      { name: "JavaScript", extensions: ["js"] },
+      { name: "TypeScript", extensions: ["ts"] },
+      { name: "Python", extensions: ["py"] },
+      { name: "Java", extensions: ["java"] },
+      { name: "Text", extensions: ["txt"] }
+    ]
+  });
+  if (!result.canceled && result.filePath) {
+    try {
+      await fs.writeFile(result.filePath, content, "utf-8");
+      return {
+        success: true,
+        path: result.filePath,
+        name: path.basename(result.filePath)
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+  return { success: false };
+});
+ipcMain.handle("execute-code", async (event, { code, language }) => {
+  if (language === "assembly" || language === "asm") {
+    try {
+      const result = assembler.execute(code);
+      return result;
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+  const { exec } = require("child_process");
+  const util = require("util");
+  const execPromise = util.promisify(exec);
+  try {
+    let command;
+    const tempFile = path.join(app.getPath("temp"), `temp_code_${Date.now()}`);
+    switch (language) {
+      case "javascript":
+        await fs.writeFile(`${tempFile}.js`, code);
+        command = `node "${tempFile}.js"`;
+        break;
+      case "python":
+        await fs.writeFile(`${tempFile}.py`, code);
+        command = `python "${tempFile}.py"`;
+        break;
+      case "java":
+        const className = code.match(/class\s+(\w+)/)?.[1] || "Main";
+        await fs.writeFile(`${tempFile}.java`, code);
+        command = `javac "${tempFile}.java" && java -cp "${path.dirname(tempFile)}" ${className}`;
+        break;
+      default:
+        return { success: false, error: "Unsupported language" };
+    }
+    const { stdout, stderr } = await execPromise(command);
+    try {
+      await fs.unlink(`${tempFile}.${language === "javascript" ? "js" : language === "python" ? "py" : "java"}`);
+    } catch (e) {
+    }
+    return {
+      success: true,
+      output: stdout,
+      error: stderr
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+      output: error.stdout || "",
+      stderr: error.stderr || ""
+    };
+  }
+});
+ipcMain.handle("assembler:reset", async (event) => {
+  assembler.reset();
+  return {
+    success: true,
+    state: assembler.getState()
+  };
+});
+ipcMain.handle("assembler:getState", async (event) => {
+  return assembler.getState();
+});
+ipcMain.handle("assembler:setRegister", async (event, register, value) => {
+  try {
+    assembler.setRegisterValue(register, value);
+    return {
+      success: true,
+      state: assembler.getState()
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});
+ipcMain.handle("assembler:getMemory", async (event, start = 0, length = 256) => {
+  const memory = assembler.memory.slice(start, start + length);
+  return {
+    success: true,
+    memory,
+    start
+  };
+});
+ipcMain.handle("assembler:setMemory", async (event, address, value) => {
+  try {
+    assembler.memory[address] = value & 255;
+    return {
+      success: true,
+      state: assembler.getState()
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+});

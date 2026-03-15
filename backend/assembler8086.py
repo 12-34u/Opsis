@@ -165,44 +165,54 @@ class Assembler8086:
             if "," in operands:
                 dst, src = self.parse_two_operands(operands)
             else:
-                dst, src = "A", operands.strip(
-                dst, src = self.parse_two_operands(operands)
-            else:
                 dst, src = "A", operands.strip()
-            value = (self.resolve_operand(dst) + self.resolve_operand(src)) & 0xFFFF
-            if "," in operands:
-                dst, src = self.parse_two_operands(operands)
-            else:
-                dst, src = "A", operands.strip(
-            self.set_flags(value)
+            result = self.resolve_operand(dst) + self.resolve_operand(src)
+            self.set_register(dst, result & 0xFFFF)
+            self.set_flags(result)
         elif opcode == "SUB":
             if "," in operands:
                 dst, src = self.parse_two_operands(operands)
             else:
                 dst, src = "A", operands.strip()
-            value = (self.resolve_operand(dst) - self.resolve_operand(src)) & 0xFFFF
-            self.set_register(dst, value)
-            self.set_flags(value)
+            result = self.resolve_operand(dst) - self.resolve_operand(src)
+            self.set_register(dst, result & 0xFFFF)
+            self.set_flags(result)
+        elif opcode == "MUL":
+            if "," in operands:
+                dst, src = self.parse_two_operands(operands)
+            else:
+                dst, src = "A", operands.strip()
+            result = self.resolve_operand(dst) * self.resolve_operand(src)
+            self.set_register(dst, result & 0xFFFF)
+            self.set_flags(result)
+        elif opcode == "DIV":
+            if "," in operands:
+                dst, src = self.parse_two_operands(operands)
+            else:
+                dst, src = "A", operands.strip()
+            divisor = self.resolve_operand(src)
+            if divisor == 0:
+                raise ValueError("Division by zero")
+            result = self.resolve_operand(dst) // divisor
+            self.set_register(dst, result & 0xFFFF)
+            self.set_flags(result)
         elif opcode == "INC":
             reg = operands.strip()
-            value = (self.resolve_operand(reg) + 1) & 0xFFFF
-            self.set_register(reg, value)
-            self.set_flags(value)
-        elifif "," in operands:
-                left, right = self.parse_two_operands(operands)
-            else:
-                left, right = "A", operands.strip(
+            result = self.resolve_operand(reg) + 1
+            self.set_register(reg, result & 0xFFFF)
+            self.set_flags(result)
+        elif opcode == "DEC":
             reg = operands.strip()
-            value = (self.resolve_operand(reg) - 1) & 0xFFFF
-            self.set_register(reg, value)
-            self.set_flags(value)
+            result = self.resolve_operand(reg) - 1
+            self.set_register(reg, result & 0xFFFF)
+            self.set_flags(result)
         elif opcode == "CMP":
             if "," in operands:
                 left, right = self.parse_two_operands(operands)
             else:
                 left, right = "A", operands.strip()
-            value = (self.resolve_operand(left) - self.resolve_operand(right)) & 0xFFFF
-            self.set_flags(value)
+            result = self.resolve_operand(left) - self.resolve_operand(right)
+            self.set_flags(result)
         elif opcode == "JMP":
             self.jump_to_label(operands.strip(), labels)
         elif opcode == "JNZ":
@@ -252,6 +262,11 @@ class Assembler8086:
         if reg_u not in self.registers:
             raise ValueError(f"Invalid register: {reg}")
         self.registers[reg_u] = value & 0xFFFF
+        # Sync 8085 accumulator A with 8086 accumulator AX
+        if reg_u == "A":
+            self.registers["AX"] = value & 0xFFFF
+        elif reg_u == "AX":
+            self.registers["A"] = value & 0xFFFF
         if reg_u == "IP":
             self.pc = self.registers[reg_u]
         if reg_u == "SP":
