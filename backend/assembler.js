@@ -49,10 +49,13 @@ class Assembler8086Bridge {
       ...payload,
     };
 
-    const result = spawnSync('python3', [this.pythonScript], {
+    const pythonCmd = process.platform === "win32" ? "python" : "python3";
+
+    const result = spawnSync(pythonCmd, [this.pythonScript], {
       input: JSON.stringify(request),
-      encoding: 'utf-8',
+      encoding: "utf-8",
       maxBuffer: 10 * 1024 * 1024,
+      shell: true
     });
 
     if (result.error) {
