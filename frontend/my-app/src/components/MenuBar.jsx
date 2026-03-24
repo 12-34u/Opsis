@@ -50,6 +50,11 @@ const MenuBar = ({ onAction }) => {
         { type: 'separator' },
         { label: 'Terminal', shortcut: 'Ctrl+`', action: 'toggleTerminal' },
         { label: 'Output', shortcut: 'Ctrl+Shift+U', action: 'toggleOutput' },
+        { type: 'separator' },
+        { label: 'Theme: Tokyo Night', action: 'themeTokyoNight' },
+        { label: 'Theme: Doodle Light', action: 'themeDoodleLight' },
+        { label: 'Theme: Doodle Dark', action: 'themeDoodleDark' },
+        { label: 'Theme: Doodle White', action: 'themeDoodleWhite' },
       ]
     },
     {
