@@ -7,6 +7,7 @@ Accepts JSON requests on stdin and emits JSON responses on stdout.
 import json
 import sys
 from copy import deepcopy
+from typing import List, Dict, Tuple, Any, Optional
 
 
 def make_initial_state():
@@ -46,11 +47,16 @@ def make_initial_state():
 
 
 class Assembler8086:
-    def __init__(self, state=None):
+    def __init__(self, state: Optional[Dict[str, Any]] = None):
+        self.registers: Dict[str, int] = {}
+        self.flags: Dict[str, bool] = {}
+        self.memory: List[int] = []
+        self.pc: int = 0
+        self.sp: int = 0
         self.load_state(state if state else make_initial_state())
-        self.output = []
-        self.execution_state = "stopped"
-        self.instruction_count = 0
+        self.output: List[Dict[str, Any]] = []
+        self.execution_state: str = "stopped"
+        self.instruction_count: int = 0
 
     def load_state(self, state):
         self.registers = deepcopy(state.get("registers", {}))
@@ -78,10 +84,11 @@ class Assembler8086:
         self.execution_state = "stopped"
         self.instruction_count = 0
 
-    def parse(self, code):
-        instructions = []
-        labels = {}
-        for raw_line in code.split("\n"):
+    def parse(self, code: str) -> Tuple[List[str], Dict[str, int], List[int]]:
+        instructions: List[str] = []
+        labels: Dict[str, int] = {}
+        line_mapping: List[int] = []
+        for i, raw_line in enumerate(code.split("\n")):
             line = raw_line.strip()
             comment_idx = line.find(";")
             if comment_idx != -1:
@@ -95,10 +102,11 @@ class Assembler8086:
                 if not line:
                     continue
             instructions.append(line)
-        return instructions, labels
+            line_mapping.append(i + 1)
+        return instructions, labels, line_mapping
 
     def execute(self, code):
-        instructions, labels = self.parse(code)
+        instructions, labels, line_mapping = self.parse(code)
         self.pc = 0
         self.registers["IP"] = 0
         self.execution_state = "running"
@@ -137,7 +145,7 @@ class Assembler8086:
                 "instructionCount": self.instruction_count,
             }
         except Exception as exc:
-            failed_line = self.pc + 1 if 0 <= self.pc < len(instructions) else None
+            failed_line = line_mapping[self.pc] if 0 <= self.pc < len(instructions) else None
             return {
                 "success": False,
                 "error": str(exc),
@@ -152,83 +160,72 @@ class Assembler8086:
 
     def execute_instruction(self, line, labels):
         parts = line.strip().split(None, 1)
+        if not parts:
+            return
         opcode = parts[0].upper()
-        operands = parts[1] if len(parts) > 1 else ""
+        operands = parts[1].strip() if len(parts) > 1 else ""
 
         if opcode == "MOV":
-            dst, src = [x.strip() for x in operands.split(",", 1)]
+            dst, src = self.parse_two_operands(operands, opcode)
             self.set_register(dst, self.resolve_operand(src))
         elif opcode == "MVI":
-            dst, imm = [x.strip() for x in operands.split(",", 1)]
+            dst, imm = self.parse_two_operands(operands, opcode)
             self.set_register(dst, self.parse_value(imm))
-        elif opcode == "ADD":
+        elif opcode in ("ADD", "SUB", "MUL", "DIV", "CMP"):
+            if not operands:
+                raise ValueError(f"Instruction {opcode} requires an operand")
             if "," in operands:
-                dst, src = self.parse_two_operands(operands)
+                dst, src = self.parse_two_operands(operands, opcode)
             else:
-                dst, src = "A", operands.strip()
-            result = self.resolve_operand(dst) + self.resolve_operand(src)
-            self.set_register(dst, result & 0xFFFF)
+                dst, src = "A", operands
+            
+            val_dst = self.resolve_operand(dst)
+            val_src = self.resolve_operand(src)
+            
+            if opcode == "ADD":
+                result = val_dst + val_src
+            elif opcode == "SUB" or opcode == "CMP":
+                result = val_dst - val_src
+            elif opcode == "MUL":
+                result = val_dst * val_src
+            elif opcode == "DIV":
+                if val_src == 0:
+                    raise ValueError("Division by zero")
+                result = val_dst // val_src
+                
+            if opcode != "CMP":
+                self.set_register(dst, result & 0xFFFF)
             self.set_flags(result)
-        elif opcode == "SUB":
-            if "," in operands:
-                dst, src = self.parse_two_operands(operands)
-            else:
-                dst, src = "A", operands.strip()
-            result = self.resolve_operand(dst) - self.resolve_operand(src)
-            self.set_register(dst, result & 0xFFFF)
-            self.set_flags(result)
-        elif opcode == "MUL":
-            if "," in operands:
-                dst, src = self.parse_two_operands(operands)
-            else:
-                dst, src = "A", operands.strip()
-            result = self.resolve_operand(dst) * self.resolve_operand(src)
-            self.set_register(dst, result & 0xFFFF)
-            self.set_flags(result)
-        elif opcode == "DIV":
-            if "," in operands:
-                dst, src = self.parse_two_operands(operands)
-            else:
-                dst, src = "A", operands.strip()
-            divisor = self.resolve_operand(src)
-            if divisor == 0:
-                raise ValueError("Division by zero")
-            result = self.resolve_operand(dst) // divisor
-            self.set_register(dst, result & 0xFFFF)
-            self.set_flags(result)
-        elif opcode == "INC":
-            reg = operands.strip()
-            result = self.resolve_operand(reg) + 1
+        elif opcode in ("INC", "DEC"):
+            if not operands:
+                raise ValueError(f"Instruction {opcode} requires a register operand")
+            reg = operands.strip().upper()
+            if reg not in self.registers:
+                raise ValueError(f"Instruction {opcode} requires a valid register, got: '{reg}'")
+            val = self.resolve_operand(reg)
+            result = val + 1 if opcode == "INC" else val - 1
             self.set_register(reg, result & 0xFFFF)
             self.set_flags(result)
-        elif opcode == "DEC":
-            reg = operands.strip()
-            result = self.resolve_operand(reg) - 1
-            self.set_register(reg, result & 0xFFFF)
-            self.set_flags(result)
-        elif opcode == "CMP":
-            if "," in operands:
-                left, right = self.parse_two_operands(operands)
+        elif opcode in ("JMP", "JNZ", "JZ"):
+            if not operands:
+                raise ValueError(f"Instruction {opcode} requires a label operand")
+            if opcode == "JMP" or (opcode == "JNZ" and not self.flags["Z"]) or (opcode == "JZ" and self.flags["Z"]):
+                self.jump_to_label(operands, labels)
+        elif opcode in ("LDA", "STA"):
+            if not operands:
+                raise ValueError(f"Instruction {opcode} requires a memory address operand")
+            addr = self.parse_value(operands)
+            if addr < 0 or addr >= len(self.memory):
+                raise ValueError(f"Memory address out of range: {addr}")
+            if opcode == "LDA":
+                self.set_register("AX", self.memory[addr] & 0xFFFF)
             else:
-                left, right = "A", operands.strip()
-            result = self.resolve_operand(left) - self.resolve_operand(right)
-            self.set_flags(result)
-        elif opcode == "JMP":
-            self.jump_to_label(operands.strip(), labels)
-        elif opcode == "JNZ":
-            if not self.flags["Z"]:
-                self.jump_to_label(operands.strip(), labels)
-        elif opcode == "JZ":
-            if self.flags["Z"]:
-                self.jump_to_label(operands.strip(), labels)
-        elif opcode == "LDA":
-            addr = self.parse_value(operands.strip())
-            self.set_register("AX", self.memory[addr] & 0xFFFF)
-        elif opcode == "STA":
-            addr = self.parse_value(operands.strip())
-            self.memory[addr] = self.resolve_operand("AX") & 0xFFFF
+                self.memory[addr] = self.resolve_operand("AX") & 0xFFFF
         elif opcode == "OUT":
-            value = self.resolve_operand(operands.strip()) if operands.strip() else self.resolve_operand("AX")
+            if operands:
+                value = self.resolve_operand(operands)
+            else:
+                value = self.resolve_operand("AX")
             self.output.append(
                 {
                     "type": "OUT",
@@ -239,28 +236,39 @@ class Assembler8086:
                 }
             )
         elif opcode in ("HLT", "INT"):
+            if operands:
+                raise ValueError(f"Instruction {opcode} does not take operands")
             self.execution_state = "stopped"
         elif opcode == "NOP":
+            if operands:
+                raise ValueError(f"Instruction {opcode} does not take operands")
             pass
         else:
-            raise ValueError(f"Unknown instruction: {opcode}")
+            raise ValueError(f"Unknown instruction: '{opcode}'")
 
-    def parse_two_operands(self, operands):
+    def parse_two_operands(self, operands, opcode=""):
+        if not operands:
+            raise ValueError(f"Instruction {opcode} requires two operands separated by a comma")
         parts = [x.strip() for x in operands.split(",", 1)]
-        if len(parts) != 2:
-            raise ValueError("Instruction requires two operands")
+        if len(parts) != 2 or not parts[0] or not parts[1]:
+            raise ValueError(f"Instruction {opcode} requires exactly two operands separated by a comma")
         return parts[0], parts[1]
 
     def resolve_operand(self, operand):
-        op = operand.upper()
-        if op in self.registers:
-            return self.registers[op] & 0xFFFF
-        return self.parse_value(operand)
+        op = operand.strip()
+        if not op:
+            raise ValueError("Missing operand")
+        op_upper = op.upper()
+        if op_upper in self.registers:
+            return self.registers[op_upper] & 0xFFFF
+        return self.parse_value(op)
 
     def set_register(self, reg, value):
-        reg_u = reg.upper()
+        reg_u = reg.strip().upper()
+        if not reg_u:
+            raise ValueError("Missing register")
         if reg_u not in self.registers:
-            raise ValueError(f"Invalid register: {reg}")
+            raise ValueError(f"Invalid register: '{reg}'")
         self.registers[reg_u] = value & 0xFFFF
         # Sync 8085 accumulator A with 8086 accumulator AX
         if reg_u == "A":
@@ -275,16 +283,23 @@ class Assembler8086:
     def parse_value(self, raw):
         val = raw.strip()
         if not val:
-            return 0
-        if val.lower().startswith("0x"):
-            return int(val, 16) & 0xFFFF
-        if val.lower().endswith("h"):
-            return int(val[:-1], 16) & 0xFFFF
-        if val.lower().startswith("0b"):
-            return int(val, 2) & 0xFFFF
-        if val.lower().endswith("b"):
-            return int(val[:-1], 2) & 0xFFFF
-        return int(val, 10) & 0xFFFF
+            raise ValueError("Missing value/number operand")
+        try:
+            val_lower = val.lower()
+            if val_lower.startswith("0x"):
+                return int(val, 16) & 0xFFFF
+            if val_lower.endswith("h"):
+                return int(val[:-1], 16) & 0xFFFF
+            if val_lower.startswith("0b"):
+                return int(val, 2) & 0xFFFF
+            if val_lower.endswith("b"):
+                return int(val[:-1], 2) & 0xFFFF
+            
+            # If no base prefix/suffix, assume decimal
+            return int(val, 10) & 0xFFFF
+        except ValueError:
+            # Re-raise standard int() casting errors as clean ASM syntax errors
+            raise ValueError(f"Invalid operand, number format, or missing 'H'/'B' suffix: '{val}'")
 
     def jump_to_label(self, label, labels):
         key = label.upper()
