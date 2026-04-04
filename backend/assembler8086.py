@@ -264,6 +264,491 @@ DEFAULT_ISA = {
             "variants": [
                 {"mode": "reg,reg", "opcode": "0x87", "byte_width": 2, "modrm": True}
             ]
+        },
+        "NEG": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "reg", "opcode": "0xF7", "byte_width": 2, "modrm_ext": 3}
+            ]
+        },
+        "SHL": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,imm", "opcode": "0xC1", "byte_width": 3, "modrm_ext": 4, "imm_width": 1},
+                {"mode": "reg,reg", "opcode": "0xD3", "byte_width": 2, "modrm_ext": 4}
+            ]
+        },
+        "SAL": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,imm", "opcode": "0xC1", "byte_width": 3, "modrm_ext": 4, "imm_width": 1}
+            ]
+        },
+        "SHR": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,imm", "opcode": "0xC1", "byte_width": 3, "modrm_ext": 5, "imm_width": 1},
+                {"mode": "reg,reg", "opcode": "0xD3", "byte_width": 2, "modrm_ext": 5}
+            ]
+        },
+        "SAR": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,imm", "opcode": "0xC1", "byte_width": 3, "modrm_ext": 7, "imm_width": 1}
+            ]
+        },
+        "ROL": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,imm", "opcode": "0xC1", "byte_width": 3, "modrm_ext": 0, "imm_width": 1}
+            ]
+        },
+        "ROR": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,imm", "opcode": "0xC1", "byte_width": 3, "modrm_ext": 1, "imm_width": 1}
+            ]
+        },
+        "RCL": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,imm", "opcode": "0xC1", "byte_width": 3, "modrm_ext": 2, "imm_width": 1}
+            ]
+        },
+        "RCR": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,imm", "opcode": "0xC1", "byte_width": 3, "modrm_ext": 3, "imm_width": 1}
+            ]
+        },
+        "TEST": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,reg", "opcode": "0x85", "byte_width": 2, "modrm": True},
+                {"mode": "reg,imm", "opcode": "0xF7", "byte_width": 4, "modrm_ext": 0, "imm_width": 2}
+            ]
+        },
+        "IMUL": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "reg", "opcode": "0xF7", "byte_width": 2, "modrm_ext": 5}
+            ]
+        },
+        "IDIV": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "reg", "opcode": "0xF7", "byte_width": 2, "modrm_ext": 7}
+            ]
+        },
+        "CBW": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x98", "byte_width": 1}
+            ]
+        },
+        "CWD": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x99", "byte_width": 1}
+            ]
+        },
+        "ADC": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,reg", "opcode": "0x11", "byte_width": 2, "modrm": True},
+                {"mode": "reg,imm", "opcode": "0x81", "byte_width": 4, "modrm_ext": 2, "imm_width": 2}
+            ]
+        },
+        "SBB": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,reg", "opcode": "0x19", "byte_width": 2, "modrm": True},
+                {"mode": "reg,imm", "opcode": "0x81", "byte_width": 4, "modrm_ext": 3, "imm_width": 2}
+            ]
+        },
+        "JC": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x72", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JB": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x72", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNAE": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x72", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNC": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x73", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNB": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x73", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JAE": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x73", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JA": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x77", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNBE": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x77", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JBE": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x76", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNA": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x76", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNGE": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x7C", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNLE": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x7F", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNL": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x7D", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JS": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x78", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNS": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x79", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JO": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x70", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNO": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x71", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JP": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x7A", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JPE": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x7A", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JNP": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x7B", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JPO": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0x7B", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "JCXZ": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0xE3", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "LOOPZ": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0xE1", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "LOOPNZ": {
+            "operand_count": 1,
+            "variants": [
+                {"mode": "label", "opcode": "0xE0", "byte_width": 2, "relative": True, "rel_width": 1}
+            ]
+        },
+        "CLC": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xF8", "byte_width": 1}
+            ]
+        },
+        "STC": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xF9", "byte_width": 1}
+            ]
+        },
+        "CMC": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xF5", "byte_width": 1}
+            ]
+        },
+        "CLD": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xFC", "byte_width": 1}
+            ]
+        },
+        "STD": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xFD", "byte_width": 1}
+            ]
+        },
+        "CLI": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xFA", "byte_width": 1}
+            ]
+        },
+        "STI": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xFB", "byte_width": 1}
+            ]
+        },
+        "LAHF": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x9F", "byte_width": 1}
+            ]
+        },
+        "SAHF": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x9E", "byte_width": 1}
+            ]
+        },
+        "PUSHF": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x9C", "byte_width": 1}
+            ]
+        },
+        "POPF": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x9D", "byte_width": 1}
+            ]
+        },
+        "IN": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "reg,imm", "opcode": "0xE5", "byte_width": 2, "imm_width": 1}
+            ]
+        },
+        "OUT": {
+            "operand_count": 2,
+            "variants": [
+                {"mode": "imm,reg", "opcode": "0xE7", "byte_width": 2, "imm_width": 1}
+            ]
+        },
+        "MOVSB": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xA4", "byte_width": 1}
+            ]
+        },
+        "MOVSW": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xA5", "byte_width": 1}
+            ]
+        },
+        "CMPSB": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xA6", "byte_width": 1}
+            ]
+        },
+        "CMPSW": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xA7", "byte_width": 1}
+            ]
+        },
+        "SCASB": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xAE", "byte_width": 1}
+            ]
+        },
+        "SCASW": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xAF", "byte_width": 1}
+            ]
+        },
+        "LODSB": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xAC", "byte_width": 1}
+            ]
+        },
+        "LODSW": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xAD", "byte_width": 1}
+            ]
+        },
+        "STOSB": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xAA", "byte_width": 1}
+            ]
+        },
+        "STOSW": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xAB", "byte_width": 1}
+            ]
+        },
+        "REP": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xF3", "byte_width": 1}
+            ]
+        },
+        "REPE": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xF3", "byte_width": 1}
+            ]
+        },
+        "REPZ": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xF3", "byte_width": 1}
+            ]
+        },
+        "REPNE": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xF2", "byte_width": 1}
+            ]
+        },
+        "REPNZ": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xF2", "byte_width": 1}
+            ]
+        },
+        "IRET": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xCF", "byte_width": 1}
+            ]
+        },
+        "AAA": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x37", "byte_width": 1}
+            ]
+        },
+        "AAS": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x3F", "byte_width": 1}
+            ]
+        },
+        "AAM": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xD4", "byte_width": 2}
+            ]
+        },
+        "AAD": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xD5", "byte_width": 2}
+            ]
+        },
+        "DAA": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x27", "byte_width": 1}
+            ]
+        },
+        "DAS": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x2F", "byte_width": 1}
+            ]
+        },
+        "XLAT": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xD7", "byte_width": 1}
+            ]
+        },
+        "WAIT": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0x9B", "byte_width": 1}
+            ]
+        },
+        "LOCK": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xF0", "byte_width": 1}
+            ]
+        },
+        "RETF": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xCB", "byte_width": 1}
+            ]
+        },
+        "INTO": {
+            "operand_count": 0,
+            "variants": [
+                {"mode": "none", "opcode": "0xCE", "byte_width": 1}
+            ]
         }
     }
 }
@@ -770,6 +1255,281 @@ class Assembler8086:
                 value = self._compute_ea(inner)
                 set_value(operands[0], value)
         
+        # Shift/Rotate operations
+        elif mnemonic == 'SHL' or mnemonic == 'SAL':
+            count = get_value(operands[1]) if len(operands) > 1 else 1
+            result = (get_value(operands[0]) << count) & 0xFFFF
+            set_value(operands[0], result)
+            update_flags(result)
+        
+        elif mnemonic == 'SHR':
+            count = get_value(operands[1]) if len(operands) > 1 else 1
+            result = get_value(operands[0]) >> count
+            set_value(operands[0], result)
+            update_flags(result)
+        
+        elif mnemonic == 'SAR':
+            count = get_value(operands[1]) if len(operands) > 1 else 1
+            val = get_value(operands[0])
+            # Arithmetic shift - preserve sign
+            if val & 0x8000:
+                result = (val >> count) | (0xFFFF << (16 - count))
+            else:
+                result = val >> count
+            result &= 0xFFFF
+            set_value(operands[0], result)
+            update_flags(result)
+        
+        elif mnemonic == 'ROL':
+            count = get_value(operands[1]) if len(operands) > 1 else 1
+            val = get_value(operands[0])
+            result = ((val << count) | (val >> (16 - count))) & 0xFFFF
+            set_value(operands[0], result)
+        
+        elif mnemonic == 'ROR':
+            count = get_value(operands[1]) if len(operands) > 1 else 1
+            val = get_value(operands[0])
+            result = ((val >> count) | (val << (16 - count))) & 0xFFFF
+            set_value(operands[0], result)
+        
+        elif mnemonic == 'RCL':
+            # Rotate through carry left
+            count = get_value(operands[1]) if len(operands) > 1 else 1
+            val = get_value(operands[0])
+            cf = (self.state['FLAGS'] >> 0) & 1
+            for _ in range(count):
+                new_cf = (val >> 15) & 1
+                val = ((val << 1) | cf) & 0xFFFF
+                cf = new_cf
+            set_value(operands[0], val)
+        
+        elif mnemonic == 'RCR':
+            # Rotate through carry right
+            count = get_value(operands[1]) if len(operands) > 1 else 1
+            val = get_value(operands[0])
+            cf = (self.state['FLAGS'] >> 0) & 1
+            for _ in range(count):
+                new_cf = val & 1
+                val = ((val >> 1) | (cf << 15)) & 0xFFFF
+                cf = new_cf
+            set_value(operands[0], val)
+        
+        # More arithmetic
+        elif mnemonic == 'NEG':
+            result = (-get_value(operands[0])) & 0xFFFF
+            set_value(operands[0], result)
+            update_flags(result)
+        
+        elif mnemonic == 'ADC':
+            cf = (self.state['FLAGS'] >> 0) & 1
+            result = get_value(operands[0]) + get_value(operands[1]) + cf
+            set_value(operands[0], result)
+            update_flags(result & 0xFFFF)
+        
+        elif mnemonic == 'SBB':
+            cf = (self.state['FLAGS'] >> 0) & 1
+            result = get_value(operands[0]) - get_value(operands[1]) - cf
+            set_value(operands[0], result)
+            update_flags(result & 0xFFFF)
+        
+        elif mnemonic == 'TEST':
+            result = get_value(operands[0]) & get_value(operands[1])
+            update_flags(result)
+        
+        elif mnemonic == 'IMUL':
+            result = self.state['AX'] * get_value(operands[0])
+            if result > 32767 or result < -32768:
+                result = result & 0xFFFFFFFF
+            self.state['AX'] = result & 0xFFFF
+            self.state['DX'] = (result >> 16) & 0xFFFF
+        
+        elif mnemonic == 'IDIV':
+            divisor = get_value(operands[0])
+            if divisor == 0:
+                raise RuntimeError("Division by zero")
+            dividend = (self.state['DX'] << 16) | self.state['AX']
+            # Handle signed division
+            if dividend & 0x80000000:
+                dividend = dividend - 0x100000000
+            if divisor & 0x8000:
+                divisor = divisor - 0x10000
+            self.state['AX'] = (dividend // divisor) & 0xFFFF
+            self.state['DX'] = (dividend % divisor) & 0xFFFF
+        
+        elif mnemonic == 'CBW':
+            # Extend AL to AX (sign extend)
+            al = self.state['AX'] & 0xFF
+            if al & 0x80:
+                self.state['AX'] = 0xFF00 | al
+            else:
+                self.state['AX'] = al
+        
+        elif mnemonic == 'CWD':
+            # Extend AX to DX:AX (sign extend)
+            if self.state['AX'] & 0x8000:
+                self.state['DX'] = 0xFFFF
+            else:
+                self.state['DX'] = 0
+        
+        # More conditional jumps
+        elif mnemonic in ('JC', 'JB', 'JNAE'):
+            if self.state['FLAGS'] & 0x01:  # CF
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('JNC', 'JNB', 'JAE'):
+            if not (self.state['FLAGS'] & 0x01):
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('JA', 'JNBE'):
+            # Above (CF=0 and ZF=0)
+            if not (self.state['FLAGS'] & 0x01) and not (self.state['FLAGS'] & 0x40):
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('JBE', 'JNA'):
+            # Below or equal (CF=1 or ZF=1)
+            if (self.state['FLAGS'] & 0x01) or (self.state['FLAGS'] & 0x40):
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('JS',):
+            if self.state['FLAGS'] & 0x80:  # SF
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('JNS',):
+            if not (self.state['FLAGS'] & 0x80):
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('JO',):
+            if self.state['FLAGS'] & 0x800:  # OF
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('JNO',):
+            if not (self.state['FLAGS'] & 0x800):
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('JP', 'JPE'):
+            if self.state['FLAGS'] & 0x04:  # PF
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('JNP', 'JPO'):
+            if not (self.state['FLAGS'] & 0x04):
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic == 'JCXZ':
+            if self.state['CX'] == 0:
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('LOOPZ', 'LOOPE'):
+            self.state['CX'] = (self.state['CX'] - 1) & 0xFFFF
+            if self.state['CX'] != 0 and (self.state['FLAGS'] & 0x40):
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        elif mnemonic in ('LOOPNZ', 'LOOPNE'):
+            self.state['CX'] = (self.state['CX'] - 1) & 0xFFFF
+            if self.state['CX'] != 0 and not (self.state['FLAGS'] & 0x40):
+                return self._resolve_jump(operands[0], label_to_idx, ip)
+        
+        # Flag operations
+        elif mnemonic == 'CLC':
+            self.state['FLAGS'] &= ~0x01
+        
+        elif mnemonic == 'STC':
+            self.state['FLAGS'] |= 0x01
+        
+        elif mnemonic == 'CMC':
+            self.state['FLAGS'] ^= 0x01
+        
+        elif mnemonic == 'CLD':
+            self.state['FLAGS'] &= ~0x400  # DF
+        
+        elif mnemonic == 'STD':
+            self.state['FLAGS'] |= 0x400
+        
+        elif mnemonic == 'CLI':
+            self.state['FLAGS'] &= ~0x200  # IF
+        
+        elif mnemonic == 'STI':
+            self.state['FLAGS'] |= 0x200
+        
+        elif mnemonic == 'LAHF':
+            # Load AH from flags (low byte)
+            self.state['AX'] = (self.state['AX'] & 0x00FF) | ((self.state['FLAGS'] & 0xFF) << 8)
+        
+        elif mnemonic == 'SAHF':
+            # Store AH into flags (low byte)
+            ah = (self.state['AX'] >> 8) & 0xFF
+            self.state['FLAGS'] = (self.state['FLAGS'] & 0xFF00) | ah
+        
+        elif mnemonic == 'PUSHF':
+            self.state['stack'].append(self.state['FLAGS'])
+            self.state['SP'] = (self.state['SP'] - 2) & 0xFFFF
+        
+        elif mnemonic == 'POPF':
+            if self.state['stack']:
+                self.state['FLAGS'] = self.state['stack'].pop()
+                self.state['SP'] = (self.state['SP'] + 2) & 0xFFFF
+        
+        # String operations (simplified - single element)
+        elif mnemonic == 'MOVSB':
+            pass  # Would copy byte [SI] to [DI], increment both
+        
+        elif mnemonic == 'MOVSW':
+            pass  # Would copy word [SI] to [DI], increment both by 2
+        
+        elif mnemonic == 'STOSB':
+            pass  # Would store AL at [DI]
+        
+        elif mnemonic == 'STOSW':
+            pass  # Would store AX at [DI]
+        
+        elif mnemonic == 'LODSB':
+            pass  # Would load byte from [SI] to AL
+        
+        elif mnemonic == 'LODSW':
+            pass  # Would load word from [SI] to AX
+        
+        # Prefix instructions (no-op in simulation)
+        elif mnemonic in ('REP', 'REPE', 'REPZ', 'REPNE', 'REPNZ', 'LOCK'):
+            pass
+        
+        elif mnemonic == 'IRET':
+            # Return from interrupt
+            if len(self.state['stack']) >= 3:
+                self.state['stack'].pop()  # flags
+                self.state['stack'].pop()  # cs
+                return self.state['stack'].pop()  # ip
+        
+        elif mnemonic == 'RETF':
+            # Far return
+            if len(self.state['stack']) >= 2:
+                self.state['stack'].pop()  # cs
+                return self.state['stack'].pop()  # ip
+        
+        elif mnemonic == 'INTO':
+            # Interrupt on overflow
+            if self.state['FLAGS'] & 0x800:
+                self.state['last_int'] = 4
+        
+        elif mnemonic == 'XLAT':
+            # Table lookup - AL = [BX + AL]
+            addr = (self.state['BX'] + (self.state['AX'] & 0xFF)) & 0xFFFF
+            mem = self.state.get('memory', {})
+            self.state['AX'] = (self.state['AX'] & 0xFF00) | mem.get(str(addr), 0)
+        
+        elif mnemonic == 'IN':
+            # Input from port - simplified
+            pass
+        
+        elif mnemonic == 'OUT':
+            # Output to port - simplified
+            pass
+        
+        elif mnemonic == 'WAIT':
+            pass
+        
+        # BCD operations (simplified)
+        elif mnemonic in ('AAA', 'AAS', 'AAM', 'AAD', 'DAA', 'DAS'):
+            pass
+        
         return None
     
     def _resolve_jump(self, target: str, label_to_idx: dict, ip: int) -> Optional[int]:
@@ -883,6 +1643,68 @@ def main():
         print(json.dumps({
             'success': True,
             'state': assembler.state
+        }))
+        return 0
+    
+    elif command == 'getState':
+        print(json.dumps({
+            'success': True,
+            'state': assembler.state
+        }))
+        return 0
+    
+    elif command == 'setRegister':
+        register = input_data.get('register', '').upper()
+        value = input_data.get('value', 0)
+        if register in assembler.state:
+            assembler.state[register] = value & 0xFFFF
+            print(json.dumps({
+                'success': True,
+                'state': assembler.state
+            }))
+        else:
+            print(json.dumps({
+                'success': False,
+                'error': f'Unknown register: {register}'
+            }))
+        return 0
+    
+    elif command == 'getRegister':
+        register = input_data.get('register', '').upper()
+        if register in assembler.state:
+            print(json.dumps({
+                'success': True,
+                'value': assembler.state[register]
+            }))
+        else:
+            print(json.dumps({
+                'success': False,
+                'error': f'Unknown register: {register}'
+            }))
+        return 0
+    
+    elif command == 'setMemory':
+        address = input_data.get('address', 0)
+        value = input_data.get('value', 0)
+        if 'memory' not in assembler.state:
+            assembler.state['memory'] = {}
+        assembler.state['memory'][str(address)] = value & 0xFF
+        print(json.dumps({
+            'success': True,
+            'state': assembler.state
+        }))
+        return 0
+    
+    elif command == 'getMemory':
+        start = input_data.get('start', 0)
+        length = input_data.get('length', 256)
+        memory = assembler.state.get('memory', {})
+        result = []
+        for i in range(start, start + length):
+            result.append(memory.get(str(i), 0))
+        print(json.dumps({
+            'success': True,
+            'memory': result
         }))
         return 0
     
