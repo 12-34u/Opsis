@@ -860,6 +860,35 @@ class Assembler8086:
                     labels[mnemonic] = value
                     continue
             
+            # Handle NAME DB/DW/DD data definition (e.g., MSG DB 'Hello$')
+            if len(parts) > 1:
+                rest = parts[1].strip().split(None, 1)
+                if rest and rest[0].upper() in ('DB', 'DW', 'DD', 'BYTE', 'WORD', 'DWORD'):
+                    # This is a data definition with a label
+                    data_label = mnemonic
+                    data_directive = rest[0].upper()
+                    data_operands = rest[1] if len(rest) > 1 else ''
+                    
+                    # Store label pointing to current address
+                    labels[data_label.upper()] = current_address
+                    
+                    # Parse data
+                    operands = self._parse_operands(data_operands)
+                    result = self.directive_handler.process(data_directive, operands, current_address)
+                    if result.byte_width > 0:
+                        parsed.append({
+                            'type': 'directive',
+                            'name': data_directive,
+                            'operands': operands,
+                            'address': current_address,
+                            'line': line_num,
+                            'source': line,
+                            'label': data_label,
+                            'data': result.data
+                        })
+                        current_address += result.byte_width
+                    continue
+            
             # Instruction
             if mnemonic not in self.instructions:
                 raise AssemblyError(f"Unknown instruction: {mnemonic}", line_num, line)
@@ -941,6 +970,10 @@ class Assembler8086:
         
         if operand.startswith('[') and operand.endswith(']'):
             return 'mem'
+        
+        # OFFSET operator returns an immediate (address)
+        if operand.startswith('OFFSET '):
+            return 'imm'
         
         # Immediate
         if operand[0].isdigit() or operand[0] == '-':
@@ -1080,6 +1113,12 @@ class Assembler8086:
         
         def get_value(op: str) -> int:
             op = op.strip().upper()
+            # Handle OFFSET operator
+            if op.startswith('OFFSET '):
+                label_name = op[7:].strip()
+                if label_name in labels:
+                    return labels[label_name]
+                return 0
             if op in self.state:
                 return self.state[op] & 0xFFFF
             if op in labels:
