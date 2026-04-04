@@ -88,6 +88,16 @@ class Assembler8086:
                 line = line[:comment_idx].strip()
             if not line:
                 continue
+            
+            # Skip MASM/TASM directives that don't generate code
+            upper_line = line.upper()
+            if any(upper_line.startswith(directive) for directive in [
+                '.MODEL', 'MODEL', '.STACK', 'STACK', '.DATA', 'DATA', 
+                '.CODE', 'CODE', 'END ', 'ASSUME', 'SEGMENT', 'ENDS', 
+                'PROC', 'ENDP', 'PUBLIC', 'EXTERN', 'EXTRN'
+            ]):
+                continue
+            
             if ":" in line:
                 label, rest = line.split(":", 1)
                 labels[label.strip().upper()] = len(instructions)
@@ -238,10 +248,15 @@ class Assembler8086:
                     "binary": f"{value:016b}",
                 }
             )
+        elif opcode == "RET":
+            self.execution_state = "stopped"
         elif opcode in ("HLT", "INT"):
             self.execution_state = "stopped"
-        elif opcode == "NOP":
-            pass
+        elif opcode in ("NOP", "CLI", "STI", "CLC", "STC", "CLD", "STD", 
+                        "PUSHF", "POPF", "CBW", "CWD", "XCHG", "CALL",
+                        "PUSH", "POP", "LEA", "LOOP", "LOOPE", "LOOPNE",
+                        "LOOPZ", "LOOPNZ"):
+            pass  # Not yet implemented but recognized
         else:
             raise ValueError(f"Unknown instruction: {opcode}")
 
