@@ -1,14 +1,14 @@
 {
-  "$schema": "isa-schema-v1",
-  "name": "x86-16-subset",
-  "description": "Dynamic ISA definition for 8086/8088 subset",
+  "name": "x86-16",
+  "version": "1.0",
   "endianness": "little",
+  "word_size": 16,
   
   "registers": {
-    "AX": {"code": 0, "width": 16, "type": "general"},
-    "CX": {"code": 1, "width": 16, "type": "general"},
-    "DX": {"code": 2, "width": 16, "type": "general"},
-    "BX": {"code": 3, "width": 16, "type": "general"},
+    "AX": {"code": 0, "width": 16, "type": "general", "parts": ["AL", "AH"]},
+    "CX": {"code": 1, "width": 16, "type": "general", "parts": ["CL", "CH"]},
+    "DX": {"code": 2, "width": 16, "type": "general", "parts": ["DL", "DH"]},
+    "BX": {"code": 3, "width": 16, "type": "general", "parts": ["BL", "BH"]},
     "SP": {"code": 4, "width": 16, "type": "pointer"},
     "BP": {"code": 5, "width": 16, "type": "pointer"},
     "SI": {"code": 6, "width": 16, "type": "index"},
@@ -26,366 +26,155 @@
     "ES": {"code": 0, "width": 16, "type": "segment"},
     "SS": {"code": 2, "width": 16, "type": "segment"}
   },
-
+  
   "directives": [
-    ".MODEL", ".STACK", ".DATA", ".CODE", "MODEL", "STACK", "DATA", "CODE",
-    ".ORG", "ORG", ".EQU", "EQU", ".DB", "DB", ".DW", "DW", ".DD", "DD",
-    ".ASCII", "ASCII", ".ASCIIZ", "ASCIIZ", ".BYTE", "BYTE", ".WORD", "WORD",
-    "END", "ASSUME", "SEGMENT", "ENDS", "PROC", "ENDP", "PUBLIC", "EXTERN", "EXTRN",
-    "MACRO", "ENDM", "LOCAL", "INCLUDE", "IF", "IFDEF", "IFNDEF", "ELSE", "ENDIF",
-    "ALIGN", "EVEN", "RESB", "RESW", "RESD", "TIMES"
+    "MODEL", "SMALL", "TINY", "MEDIUM", "COMPACT", "LARGE", "HUGE",
+    "STACK", "DATA", "CODE", "SEGMENT", "ENDS", "ASSUME",
+    "PROC", "ENDP", "END", "ORG", "EQU",
+    "DB", "DW", "DD", "DQ", "DT", "BYTE", "WORD", "DWORD",
+    "PUBLIC", "EXTERN", "EXTRN", "GLOBAL",
+    "MACRO", "ENDM", "LOCAL", "PURGE",
+    "IF", "IFE", "IFDEF", "IFNDEF", "ELSE", "ELSEIF", "ENDIF",
+    "INCLUDE", "INCLUDELIB",
+    "TITLE", "NAME", "PAGE", "COMMENT"
   ],
-
+  
   "instructions": {
-    "MOV": {
-      "description": "Move data",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,reg", "opcode": "0x89", "modrm": true, "byte_width": 2},
-        {"mode": "reg,imm", "opcode": "0xB8", "byte_width": 3, "imm_width": 2},
-        {"mode": "reg,mem", "opcode": "0x8B", "modrm": true, "byte_width": 4},
-        {"mode": "mem,reg", "opcode": "0x89", "modrm": true, "byte_width": 4}
-      ]
-    },
-    "ADD": {
-      "description": "Add",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,reg", "opcode": "0x01", "modrm": true, "byte_width": 2},
-        {"mode": "reg,imm", "opcode": "0x81", "modrm_ext": 0, "byte_width": 4, "imm_width": 2}
-      ]
-    },
-    "SUB": {
-      "description": "Subtract",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,reg", "opcode": "0x29", "modrm": true, "byte_width": 2},
-        {"mode": "reg,imm", "opcode": "0x81", "modrm_ext": 5, "byte_width": 4, "imm_width": 2}
-      ]
-    },
-    "MUL": {
-      "description": "Unsigned multiply",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "reg", "opcode": "0xF7", "modrm_ext": 4, "byte_width": 2}
-      ]
-    },
-    "DIV": {
-      "description": "Unsigned divide",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "reg", "opcode": "0xF7", "modrm_ext": 6, "byte_width": 2}
-      ]
-    },
-    "INC": {
-      "description": "Increment",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "reg", "opcode": "0x40", "reg_in_opcode": true, "byte_width": 1}
-      ]
-    },
-    "DEC": {
-      "description": "Decrement",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "reg", "opcode": "0x48", "reg_in_opcode": true, "byte_width": 1}
-      ]
-    },
-    "CMP": {
-      "description": "Compare",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,reg", "opcode": "0x39", "modrm": true, "byte_width": 2},
-        {"mode": "reg,imm", "opcode": "0x81", "modrm_ext": 7, "byte_width": 4, "imm_width": 2}
-      ]
-    },
-    "AND": {
-      "description": "Logical AND",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,reg", "opcode": "0x21", "modrm": true, "byte_width": 2},
-        {"mode": "reg,imm", "opcode": "0x81", "modrm_ext": 4, "byte_width": 4, "imm_width": 2}
-      ]
-    },
-    "OR": {
-      "description": "Logical OR",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,reg", "opcode": "0x09", "modrm": true, "byte_width": 2}
-      ]
-    },
-    "XOR": {
-      "description": "Logical XOR",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,reg", "opcode": "0x31", "modrm": true, "byte_width": 2}
-      ]
-    },
-    "NOT": {
-      "description": "Logical NOT",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "reg", "opcode": "0xF7", "modrm_ext": 2, "byte_width": 2}
-      ]
-    },
-    "JMP": {
-      "description": "Unconditional jump",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0xE9", "byte_width": 3, "relative": true, "rel_width": 2}
-      ]
-    },
-    "JZ": {
-      "description": "Jump if zero",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0x74", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "JE": {
-      "description": "Jump if equal",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0x74", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "JNZ": {
-      "description": "Jump if not zero",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0x75", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "JNE": {
-      "description": "Jump if not equal",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0x75", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "JG": {
-      "description": "Jump if greater",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0x7F", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "JL": {
-      "description": "Jump if less",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0x7C", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "JGE": {
-      "description": "Jump if greater or equal",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0x7D", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "JLE": {
-      "description": "Jump if less or equal",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0x7E", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "LOOP": {
-      "description": "Loop with CX",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0xE2", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "LOOPE": {
-      "description": "Loop while equal",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0xE1", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "LOOPNE": {
-      "description": "Loop while not equal",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0xE0", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "LOOPZ": {
-      "description": "Loop while zero",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0xE1", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "LOOPNZ": {
-      "description": "Loop while not zero",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0xE0", "byte_width": 2, "relative": true, "rel_width": 1}
-      ]
-    },
-    "CALL": {
-      "description": "Call procedure",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "label", "opcode": "0xE8", "byte_width": 3, "relative": true, "rel_width": 2}
-      ]
-    },
-    "RET": {
-      "description": "Return",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0xC3", "byte_width": 1}
-      ]
-    },
-    "PUSH": {
-      "description": "Push onto stack",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "reg", "opcode": "0x50", "reg_in_opcode": true, "byte_width": 1}
-      ]
-    },
-    "POP": {
-      "description": "Pop from stack",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "reg", "opcode": "0x58", "reg_in_opcode": true, "byte_width": 1}
-      ]
-    },
-    "INT": {
-      "description": "Software interrupt",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "imm", "opcode": "0xCD", "byte_width": 2, "imm_width": 1}
-      ]
-    },
-    "NOP": {
-      "description": "No operation",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0x90", "byte_width": 1}
-      ]
-    },
-    "HLT": {
-      "description": "Halt",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0xF4", "byte_width": 1}
-      ]
-    },
-    "CLI": {
-      "description": "Clear interrupt flag",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0xFA", "byte_width": 1}
-      ]
-    },
-    "STI": {
-      "description": "Set interrupt flag",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0xFB", "byte_width": 1}
-      ]
-    },
-    "CLC": {
-      "description": "Clear carry flag",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0xF8", "byte_width": 1}
-      ]
-    },
-    "STC": {
-      "description": "Set carry flag",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0xF9", "byte_width": 1}
-      ]
-    },
-    "PUSHF": {
-      "description": "Push flags",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0x9C", "byte_width": 1}
-      ]
-    },
-    "POPF": {
-      "description": "Pop flags",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0x9D", "byte_width": 1}
-      ]
-    },
-    "XCHG": {
-      "description": "Exchange",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,reg", "opcode": "0x87", "modrm": true, "byte_width": 2}
-      ]
-    },
-    "CBW": {
-      "description": "Convert byte to word",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0x98", "byte_width": 1}
-      ]
-    },
-    "CWD": {
-      "description": "Convert word to dword",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0x99", "byte_width": 1}
-      ]
-    },
-    "OUT": {
-      "description": "Output to port",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "imm,reg", "opcode": "0xE7", "byte_width": 2, "imm_width": 1}
-      ]
-    },
-    "IN": {
-      "description": "Input from port",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,imm", "opcode": "0xE5", "byte_width": 2, "imm_width": 1}
-      ]
-    },
-    "LEA": {
-      "description": "Load effective address",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,mem", "opcode": "0x8D", "modrm": true, "byte_width": 4}
-      ]
-    },
-    "LDA": {
-      "description": "Load accumulator (8085 compat)",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "imm", "opcode": "0xA1", "byte_width": 3, "imm_width": 2}
-      ]
-    },
-    "STA": {
-      "description": "Store accumulator (8085 compat)",
-      "operand_count": 1,
-      "variants": [
-        {"mode": "imm", "opcode": "0xA3", "byte_width": 3, "imm_width": 2}
-      ]
-    },
-    "MVI": {
-      "description": "Move immediate (8085 compat)",
-      "operand_count": 2,
-      "variants": [
-        {"mode": "reg,imm", "opcode": "0xB8", "byte_width": 3, "imm_width": 2}
-      ]
-    },
-    "IRET": {
-      "description": "Interrupt return",
-      "operand_count": 0,
-      "variants": [
-        {"mode": "none", "opcode": "0xCF", "byte_width": 1}
-      ]
-    }
+    "MOV": {"operands": 2, "variants": [
+      {"mode": "reg,reg", "opcode": "89", "width": 2},
+      {"mode": "reg,imm", "opcode": "B8", "width": 3},
+      {"mode": "reg,mem", "opcode": "8B", "width": 4},
+      {"mode": "mem,reg", "opcode": "89", "width": 4},
+      {"mode": "mem,imm", "opcode": "C7", "width": 6}
+    ]},
+    "ADD": {"operands": 2, "variants": [
+      {"mode": "reg,reg", "opcode": "01", "width": 2},
+      {"mode": "reg,imm", "opcode": "81", "width": 4},
+      {"mode": "reg,mem", "opcode": "03", "width": 4}
+    ]},
+    "SUB": {"operands": 2, "variants": [
+      {"mode": "reg,reg", "opcode": "29", "width": 2},
+      {"mode": "reg,imm", "opcode": "81", "width": 4}
+    ]},
+    "MUL": {"operands": 1, "variants": [{"mode": "reg", "opcode": "F7", "width": 2}]},
+    "DIV": {"operands": 1, "variants": [{"mode": "reg", "opcode": "F7", "width": 2}]},
+    "IMUL": {"operands": 1, "variants": [{"mode": "reg", "opcode": "F7", "width": 2}]},
+    "IDIV": {"operands": 1, "variants": [{"mode": "reg", "opcode": "F7", "width": 2}]},
+    "INC": {"operands": 1, "variants": [{"mode": "reg", "opcode": "40", "width": 1}]},
+    "DEC": {"operands": 1, "variants": [{"mode": "reg", "opcode": "48", "width": 1}]},
+    "NEG": {"operands": 1, "variants": [{"mode": "reg", "opcode": "F7", "width": 2}]},
+    "AND": {"operands": 2, "variants": [
+      {"mode": "reg,reg", "opcode": "21", "width": 2},
+      {"mode": "reg,imm", "opcode": "81", "width": 4}
+    ]},
+    "OR": {"operands": 2, "variants": [
+      {"mode": "reg,reg", "opcode": "09", "width": 2},
+      {"mode": "reg,imm", "opcode": "81", "width": 4}
+    ]},
+    "XOR": {"operands": 2, "variants": [
+      {"mode": "reg,reg", "opcode": "31", "width": 2},
+      {"mode": "reg,imm", "opcode": "81", "width": 4}
+    ]},
+    "NOT": {"operands": 1, "variants": [{"mode": "reg", "opcode": "F7", "width": 2}]},
+    "TEST": {"operands": 2, "variants": [
+      {"mode": "reg,reg", "opcode": "85", "width": 2},
+      {"mode": "reg,imm", "opcode": "F7", "width": 4}
+    ]},
+    "SHL": {"operands": 2, "variants": [{"mode": "reg,imm", "opcode": "C1", "width": 3}]},
+    "SHR": {"operands": 2, "variants": [{"mode": "reg,imm", "opcode": "C1", "width": 3}]},
+    "SAL": {"operands": 2, "variants": [{"mode": "reg,imm", "opcode": "C1", "width": 3}]},
+    "SAR": {"operands": 2, "variants": [{"mode": "reg,imm", "opcode": "C1", "width": 3}]},
+    "ROL": {"operands": 2, "variants": [{"mode": "reg,imm", "opcode": "C1", "width": 3}]},
+    "ROR": {"operands": 2, "variants": [{"mode": "reg,imm", "opcode": "C1", "width": 3}]},
+    "RCL": {"operands": 2, "variants": [{"mode": "reg,imm", "opcode": "C1", "width": 3}]},
+    "RCR": {"operands": 2, "variants": [{"mode": "reg,imm", "opcode": "C1", "width": 3}]},
+    "CMP": {"operands": 2, "variants": [
+      {"mode": "reg,reg", "opcode": "39", "width": 2},
+      {"mode": "reg,imm", "opcode": "81", "width": 4}
+    ]},
+    "PUSH": {"operands": 1, "variants": [{"mode": "reg", "opcode": "50", "width": 1}]},
+    "POP": {"operands": 1, "variants": [{"mode": "reg", "opcode": "58", "width": 1}]},
+    "PUSHF": {"operands": 0, "variants": [{"mode": "none", "opcode": "9C", "width": 1}]},
+    "POPF": {"operands": 0, "variants": [{"mode": "none", "opcode": "9D", "width": 1}]},
+    "PUSHA": {"operands": 0, "variants": [{"mode": "none", "opcode": "60", "width": 1}]},
+    "POPA": {"operands": 0, "variants": [{"mode": "none", "opcode": "61", "width": 1}]},
+    "JMP": {"operands": 1, "variants": [{"mode": "label", "opcode": "EB", "width": 2}]},
+    "JE": {"operands": 1, "variants": [{"mode": "label", "opcode": "74", "width": 2}]},
+    "JZ": {"operands": 1, "variants": [{"mode": "label", "opcode": "74", "width": 2}]},
+    "JNE": {"operands": 1, "variants": [{"mode": "label", "opcode": "75", "width": 2}]},
+    "JNZ": {"operands": 1, "variants": [{"mode": "label", "opcode": "75", "width": 2}]},
+    "JG": {"operands": 1, "variants": [{"mode": "label", "opcode": "7F", "width": 2}]},
+    "JGE": {"operands": 1, "variants": [{"mode": "label", "opcode": "7D", "width": 2}]},
+    "JL": {"operands": 1, "variants": [{"mode": "label", "opcode": "7C", "width": 2}]},
+    "JLE": {"operands": 1, "variants": [{"mode": "label", "opcode": "7E", "width": 2}]},
+    "JA": {"operands": 1, "variants": [{"mode": "label", "opcode": "77", "width": 2}]},
+    "JAE": {"operands": 1, "variants": [{"mode": "label", "opcode": "73", "width": 2}]},
+    "JB": {"operands": 1, "variants": [{"mode": "label", "opcode": "72", "width": 2}]},
+    "JBE": {"operands": 1, "variants": [{"mode": "label", "opcode": "76", "width": 2}]},
+    "JC": {"operands": 1, "variants": [{"mode": "label", "opcode": "72", "width": 2}]},
+    "JNC": {"operands": 1, "variants": [{"mode": "label", "opcode": "73", "width": 2}]},
+    "JS": {"operands": 1, "variants": [{"mode": "label", "opcode": "78", "width": 2}]},
+    "JNS": {"operands": 1, "variants": [{"mode": "label", "opcode": "79", "width": 2}]},
+    "JO": {"operands": 1, "variants": [{"mode": "label", "opcode": "70", "width": 2}]},
+    "JNO": {"operands": 1, "variants": [{"mode": "label", "opcode": "71", "width": 2}]},
+    "JP": {"operands": 1, "variants": [{"mode": "label", "opcode": "7A", "width": 2}]},
+    "JNP": {"operands": 1, "variants": [{"mode": "label", "opcode": "7B", "width": 2}]},
+    "JCXZ": {"operands": 1, "variants": [{"mode": "label", "opcode": "E3", "width": 2}]},
+    "LOOP": {"operands": 1, "variants": [{"mode": "label", "opcode": "E2", "width": 2}]},
+    "LOOPE": {"operands": 1, "variants": [{"mode": "label", "opcode": "E1", "width": 2}]},
+    "LOOPZ": {"operands": 1, "variants": [{"mode": "label", "opcode": "E1", "width": 2}]},
+    "LOOPNE": {"operands": 1, "variants": [{"mode": "label", "opcode": "E0", "width": 2}]},
+    "LOOPNZ": {"operands": 1, "variants": [{"mode": "label", "opcode": "E0", "width": 2}]},
+    "CALL": {"operands": 1, "variants": [{"mode": "label", "opcode": "E8", "width": 3}]},
+    "RET": {"operands": 0, "variants": [{"mode": "none", "opcode": "C3", "width": 1}]},
+    "RETF": {"operands": 0, "variants": [{"mode": "none", "opcode": "CB", "width": 1}]},
+    "INT": {"operands": 1, "variants": [{"mode": "imm", "opcode": "CD", "width": 2}]},
+    "IRET": {"operands": 0, "variants": [{"mode": "none", "opcode": "CF", "width": 1}]},
+    "INTO": {"operands": 0, "variants": [{"mode": "none", "opcode": "CE", "width": 1}]},
+    "NOP": {"operands": 0, "variants": [{"mode": "none", "opcode": "90", "width": 1}]},
+    "HLT": {"operands": 0, "variants": [{"mode": "none", "opcode": "F4", "width": 1}]},
+    "CLC": {"operands": 0, "variants": [{"mode": "none", "opcode": "F8", "width": 1}]},
+    "STC": {"operands": 0, "variants": [{"mode": "none", "opcode": "F9", "width": 1}]},
+    "CMC": {"operands": 0, "variants": [{"mode": "none", "opcode": "F5", "width": 1}]},
+    "CLD": {"operands": 0, "variants": [{"mode": "none", "opcode": "FC", "width": 1}]},
+    "STD": {"operands": 0, "variants": [{"mode": "none", "opcode": "FD", "width": 1}]},
+    "CLI": {"operands": 0, "variants": [{"mode": "none", "opcode": "FA", "width": 1}]},
+    "STI": {"operands": 0, "variants": [{"mode": "none", "opcode": "FB", "width": 1}]},
+    "LAHF": {"operands": 0, "variants": [{"mode": "none", "opcode": "9F", "width": 1}]},
+    "SAHF": {"operands": 0, "variants": [{"mode": "none", "opcode": "9E", "width": 1}]},
+    "CBW": {"operands": 0, "variants": [{"mode": "none", "opcode": "98", "width": 1}]},
+    "CWD": {"operands": 0, "variants": [{"mode": "none", "opcode": "99", "width": 1}]},
+    "XCHG": {"operands": 2, "variants": [{"mode": "reg,reg", "opcode": "87", "width": 2}]},
+    "LEA": {"operands": 2, "variants": [{"mode": "reg,mem", "opcode": "8D", "width": 4}]},
+    "LDS": {"operands": 2, "variants": [{"mode": "reg,mem", "opcode": "C5", "width": 4}]},
+    "LES": {"operands": 2, "variants": [{"mode": "reg,mem", "opcode": "C4", "width": 4}]},
+    "XLAT": {"operands": 0, "variants": [{"mode": "none", "opcode": "D7", "width": 1}]},
+    "IN": {"operands": 2, "variants": [{"mode": "reg,imm", "opcode": "E5", "width": 2}]},
+    "OUT": {"operands": 2, "variants": [{"mode": "imm,reg", "opcode": "E7", "width": 2}]},
+    "MOVSB": {"operands": 0, "variants": [{"mode": "none", "opcode": "A4", "width": 1}]},
+    "MOVSW": {"operands": 0, "variants": [{"mode": "none", "opcode": "A5", "width": 1}]},
+    "CMPSB": {"operands": 0, "variants": [{"mode": "none", "opcode": "A6", "width": 1}]},
+    "CMPSW": {"operands": 0, "variants": [{"mode": "none", "opcode": "A7", "width": 1}]},
+    "SCASB": {"operands": 0, "variants": [{"mode": "none", "opcode": "AE", "width": 1}]},
+    "SCASW": {"operands": 0, "variants": [{"mode": "none", "opcode": "AF", "width": 1}]},
+    "LODSB": {"operands": 0, "variants": [{"mode": "none", "opcode": "AC", "width": 1}]},
+    "LODSW": {"operands": 0, "variants": [{"mode": "none", "opcode": "AD", "width": 1}]},
+    "STOSB": {"operands": 0, "variants": [{"mode": "none", "opcode": "AA", "width": 1}]},
+    "STOSW": {"operands": 0, "variants": [{"mode": "none", "opcode": "AB", "width": 1}]},
+    "REP": {"operands": 0, "variants": [{"mode": "none", "opcode": "F3", "width": 1}]},
+    "REPE": {"operands": 0, "variants": [{"mode": "none", "opcode": "F3", "width": 1}]},
+    "REPZ": {"operands": 0, "variants": [{"mode": "none", "opcode": "F3", "width": 1}]},
+    "REPNE": {"operands": 0, "variants": [{"mode": "none", "opcode": "F2", "width": 1}]},
+    "REPNZ": {"operands": 0, "variants": [{"mode": "none", "opcode": "F2", "width": 1}]},
+    "AAA": {"operands": 0, "variants": [{"mode": "none", "opcode": "37", "width": 1}]},
+    "AAS": {"operands": 0, "variants": [{"mode": "none", "opcode": "3F", "width": 1}]},
+    "AAM": {"operands": 0, "variants": [{"mode": "none", "opcode": "D4", "width": 2}]},
+    "AAD": {"operands": 0, "variants": [{"mode": "none", "opcode": "D5", "width": 2}]},
+    "DAA": {"operands": 0, "variants": [{"mode": "none", "opcode": "27", "width": 1}]},
+    "DAS": {"operands": 0, "variants": [{"mode": "none", "opcode": "2F", "width": 1}]},
+    "ADC": {"operands": 2, "variants": [{"mode": "reg,reg", "opcode": "11", "width": 2}]},
+    "SBB": {"operands": 2, "variants": [{"mode": "reg,reg", "opcode": "19", "width": 2}]},
+    "LOCK": {"operands": 0, "variants": [{"mode": "none", "opcode": "F0", "width": 1}]},
+    "WAIT": {"operands": 0, "variants": [{"mode": "none", "opcode": "9B", "width": 1}]}
   }
 }

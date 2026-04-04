@@ -1,182 +1,150 @@
 #!/usr/bin/env python3
 """
-Symbol Table module for the Dynamic Two-Pass Assembler.
-Handles label definitions, constants, and forward reference tracking.
+Symbol Table module for 8086 Assembler.
+Manages labels, constants, and forward references.
 """
 
-from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Set
 
 
 class DuplicateLabelError(Exception):
-    """Raised when attempting to redefine an existing label."""
-    def __init__(self, name: str, line: int):
-        self.name = name
-        self.line = line
-        super().__init__(f"Duplicate label '{name}' at line {line}")
+    """Raised when a label is defined more than once."""
+    pass
 
 
 class UndefinedSymbolError(Exception):
-    """Raised when referencing an undefined symbol."""
-    def __init__(self, name: str, line: int = 0):
-        self.name = name
-        self.line = line
-        super().__init__(f"Undefined symbol '{name}'" + (f" at line {line}" if line else ""))
+    """Raised when a symbol is referenced but not defined."""
+    pass
 
 
 @dataclass
 class Symbol:
-    """Represents a symbol table entry."""
+    """Represents a symbol (label or constant)."""
     name: str
     value: int
     is_constant: bool = False
-    is_defined: bool = True
     line_defined: int = 0
-    references: List[int] = field(default_factory=list)
+    segment: Optional[str] = None
+    size: int = 0  # For data labels
 
 
 class SymbolTable:
     """
-    Symbol table for tracking labels, constants, and forward references.
-    
-    Provides methods to define symbols, resolve addresses, and track
-    forward references for validation after Pass 1.
+    Symbol table for assembly.
+    Tracks labels, constants, and forward references.
     """
     
     def __init__(self):
         """Initialize empty symbol table."""
-        self._symbols: Dict[str, Symbol] = {}
-        self._forward_refs: Set[str] = set()
+        self.symbols: Dict[str, Symbol] = {}
+        self.forward_refs: Dict[str, List[int]] = {}  # symbol -> [lines where referenced]
     
-    def define(self, name: str, value: int, is_constant: bool = False, line: int = 0) -> None:
+    def define(self, name: str, value: int, is_constant: bool = False, 
+               line: int = 0, segment: str = None, size: int = 0) -> None:
         """
-        Define a symbol with a value.
+        Define a symbol.
         
         Args:
             name: Symbol name.
             value: Symbol value (address or constant).
-            is_constant: True if this is a constant (EQU), not a label.
-            line: Source line number where defined.
+            is_constant: True if EQU constant.
+            line: Line number where defined.
+            segment: Segment name (optional).
+            size: Data size in bytes (for data labels).
             
         Raises:
-            DuplicateLabelError: If symbol is already defined.
+            DuplicateLabelError: If symbol already exists.
         """
         upper_name = name.upper()
-        if upper_name in self._symbols and self._symbols[upper_name].is_defined:
-            raise DuplicateLabelError(name, line)
         
-        # Remove from forward refs if it was referenced before definition
-        self._forward_refs.discard(upper_name)
+        if upper_name in self.symbols:
+            existing = self.symbols[upper_name]
+            raise DuplicateLabelError(
+                f"Symbol '{name}' already defined at line {existing.line_defined}"
+            )
         
-        self._symbols[upper_name] = Symbol(
+        self.symbols[upper_name] = Symbol(
             name=name,
             value=value,
             is_constant=is_constant,
-            is_defined=True,
-            line_defined=line
+            line_defined=line,
+            segment=segment,
+            size=size
         )
-    
-    def reference(self, name: str, from_line: int = 0) -> None:
-        """
-        Record a reference to a symbol (for forward reference tracking).
         
-        Args:
-            name: Symbol name being referenced.
-            from_line: Line number where the reference occurs.
-        """
-        upper_name = name.upper()
-        if upper_name not in self._symbols:
-            self._forward_refs.add(upper_name)
-            # Create placeholder
-            self._symbols[upper_name] = Symbol(
-                name=name,
-                value=0,
-                is_defined=False,
-                references=[from_line]
-            )
-        elif not self._symbols[upper_name].is_defined:
-            self._symbols[upper_name].references.append(from_line)
+        # Resolve any forward references
+        if upper_name in self.forward_refs:
+            del self.forward_refs[upper_name]
     
     def resolve(self, name: str) -> int:
         """
-        Resolve a symbol to its value.
+        Get symbol value.
         
         Args:
-            name: Symbol name to resolve.
+            name: Symbol name.
             
         Returns:
             Symbol value.
             
         Raises:
-            UndefinedSymbolError: If symbol is not defined.
+            UndefinedSymbolError: If symbol not defined.
         """
         upper_name = name.upper()
-        if upper_name not in self._symbols:
-            raise UndefinedSymbolError(name)
-        symbol = self._symbols[upper_name]
-        if not symbol.is_defined:
-            raise UndefinedSymbolError(name)
-        return symbol.value
+        
+        if upper_name not in self.symbols:
+            raise UndefinedSymbolError(f"Undefined symbol: '{name}'")
+        
+        return self.symbols[upper_name].value
     
     def is_defined(self, name: str) -> bool:
+        """Check if symbol is defined."""
+        return name.upper() in self.symbols
+    
+    def reference(self, name: str, line: int) -> None:
         """
-        Check if a symbol is defined.
+        Record a forward reference.
         
         Args:
-            name: Symbol name.
-            
-        Returns:
-            True if symbol is defined, False otherwise.
+            name: Symbol name being referenced.
+            line: Line number of reference.
         """
         upper_name = name.upper()
-        return upper_name in self._symbols and self._symbols[upper_name].is_defined
+        
+        if upper_name not in self.symbols:
+            if upper_name not in self.forward_refs:
+                self.forward_refs[upper_name] = []
+            self.forward_refs[upper_name].append(line)
     
     def get_forward_refs(self) -> List[str]:
-        """
-        Get list of symbols referenced but not yet defined.
-        
-        Returns:
-            List of undefined symbol names.
-        """
-        return [
-            name for name, sym in self._symbols.items()
-            if not sym.is_defined
-        ]
+        """Get list of unresolved forward references."""
+        return list(self.forward_refs.keys())
     
-    def get_all_symbols(self) -> Dict[str, Symbol]:
-        """
-        Get all defined symbols.
-        
-        Returns:
-            Dictionary of symbol name to Symbol object.
-        """
-        return {k: v for k, v in self._symbols.items() if v.is_defined}
-    
-    def dump(self) -> str:
-        """
-        Generate human-readable symbol table dump.
-        
-        Returns:
-            Formatted string representation.
-        """
-        lines = [
-            "Symbol Table",
-            "=" * 60,
-            f"{'Name':<20} {'Value':<12} {'Type':<10} {'Line':<6}",
-            "-" * 60
-        ]
-        
-        for name, sym in sorted(self._symbols.items()):
-            if sym.is_defined:
-                sym_type = "CONSTANT" if sym.is_constant else "LABEL"
-                val_str = f"0x{sym.value:04X}"
-                lines.append(f"{sym.name:<20} {val_str:<12} {sym_type:<10} {sym.line_defined:<6}")
-        
-        lines.append("=" * 60)
-        return "\n".join(lines)
+    def get_symbol(self, name: str) -> Optional[Symbol]:
+        """Get symbol object."""
+        return self.symbols.get(name.upper())
     
     def clear(self) -> None:
-        """Clear all symbols and forward references."""
-        self._symbols.clear()
-        self._forward_refs.clear()
+        """Clear all symbols."""
+        self.symbols.clear()
+        self.forward_refs.clear()
+    
+    def dump(self) -> str:
+        """Dump symbol table as formatted string."""
+        lines = [
+            "Symbol Table",
+            "=" * 50,
+            f"{'Name':<20} {'Value':<10} {'Type':<10} {'Line':<6}",
+            "-" * 50
+        ]
+        
+        for name, sym in sorted(self.symbols.items()):
+            sym_type = "CONST" if sym.is_constant else "LABEL"
+            lines.append(f"{sym.name:<20} {sym.value:04X}h      {sym_type:<10} {sym.line_defined:<6}")
+        
+        lines.append("=" * 50)
+        return '\n'.join(lines)
+    
+    def to_dict(self) -> Dict[str, int]:
+        """Export as simple name -> value dictionary."""
+        return {name: sym.value for name, sym in self.symbols.items()}

@@ -1,23 +1,17 @@
 #!/usr/bin/env python3
 """
-Emitter module for the Dynamic Two-Pass Assembler.
-Handles byte-width-aware machine code emission with multiple output formats.
+Emitter module for 8086 Assembler.
+Generates machine code bytes with multiple output formats.
 """
 
-from __future__ import annotations
 import struct
-from typing import List, Optional, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from assembler_engine import IRNode
+from typing import List, Optional
 
 
 class Emitter:
     """
-    Machine code emitter with multiple output formats.
-    
-    Provides byte-width-aware emission and supports binary, hex,
-    Intel HEX, and listing output formats.
+    Machine code emitter.
+    Emits bytes with proper byte ordering and provides multiple output formats.
     """
     
     def __init__(self, endianness: str = 'little', origin: int = 0):
@@ -25,179 +19,119 @@ class Emitter:
         Initialize emitter.
         
         Args:
-            endianness: Byte order ('little' or 'big').
+            endianness: 'little' or 'big'.
             origin: Base address for output.
         """
         self.endianness = endianness
         self.origin = origin
-        self.output: bytearray = bytearray()
-        self.current_address = origin
+        self.buffer: bytearray = bytearray()
+        self.address = origin
     
     def emit_byte(self, value: int) -> None:
-        """
-        Emit a single byte.
-        
-        Args:
-            value: Byte value (0-255).
-        """
-        self.output.append(value & 0xFF)
-        self.current_address += 1
+        """Emit a single byte (8-bit)."""
+        self.buffer.append(value & 0xFF)
+        self.address += 1
     
     def emit_word(self, value: int) -> None:
-        """
-        Emit a 16-bit word.
-        
-        Args:
-            value: Word value (0-65535).
-        """
+        """Emit a word (16-bit)."""
         if self.endianness == 'little':
-            self.output.extend(struct.pack('<H', value & 0xFFFF))
+            self.buffer.append(value & 0xFF)
+            self.buffer.append((value >> 8) & 0xFF)
         else:
-            self.output.extend(struct.pack('>H', value & 0xFFFF))
-        self.current_address += 2
+            self.buffer.append((value >> 8) & 0xFF)
+            self.buffer.append(value & 0xFF)
+        self.address += 2
     
     def emit_dword(self, value: int) -> None:
-        """
-        Emit a 32-bit double word.
-        
-        Args:
-            value: Double word value.
-        """
+        """Emit a double word (32-bit)."""
         if self.endianness == 'little':
-            self.output.extend(struct.pack('<I', value & 0xFFFFFFFF))
+            self.buffer.extend(struct.pack('<I', value & 0xFFFFFFFF))
         else:
-            self.output.extend(struct.pack('>I', value & 0xFFFFFFFF))
-        self.current_address += 4
+            self.buffer.extend(struct.pack('>I', value & 0xFFFFFFFF))
+        self.address += 4
     
     def emit_bytes(self, data: bytes) -> None:
-        """
-        Emit raw bytes.
-        
-        Args:
-            data: Byte sequence to emit.
-        """
-        self.output.extend(data)
-        self.current_address += len(data)
+        """Emit raw bytes."""
+        self.buffer.extend(data)
+        self.address += len(data)
+    
+    def emit_string(self, s: str, null_terminate: bool = False) -> None:
+        """Emit ASCII string."""
+        self.buffer.extend(s.encode('ascii', errors='replace'))
+        if null_terminate:
+            self.buffer.append(0)
+        self.address += len(s) + (1 if null_terminate else 0)
     
     def emit_signed_byte(self, value: int) -> None:
-        """
-        Emit a signed byte.
-        
-        Args:
-            value: Signed byte value (-128 to 127).
-        """
+        """Emit signed byte."""
         if value < 0:
             value = (256 + value) & 0xFF
         self.emit_byte(value)
     
     def emit_signed_word(self, value: int) -> None:
-        """
-        Emit a signed word.
-        
-        Args:
-            value: Signed word value.
-        """
+        """Emit signed word."""
         if value < 0:
             value = (65536 + value) & 0xFFFF
         self.emit_word(value)
     
-    def emit_modrm(self, mod: int, reg: int, rm: int) -> None:
-        """
-        Emit ModR/M byte.
-        
-        Args:
-            mod: Addressing mode (0-3).
-            reg: Register or opcode extension (0-7).
-            rm: Register/memory operand (0-7).
-        """
-        modrm = ((mod & 0x3) << 6) | ((reg & 0x7) << 3) | (rm & 0x7)
-        self.emit_byte(modrm)
-    
     def get_position(self) -> int:
-        """Get current output position."""
-        return len(self.output)
+        """Get current position in buffer."""
+        return len(self.buffer)
     
     def patch_byte(self, offset: int, value: int) -> None:
-        """
-        Patch a byte at a specific offset.
-        
-        Args:
-            offset: Offset in output buffer.
-            value: New byte value.
-        """
-        self.output[offset] = value & 0xFF
+        """Patch a byte at specific offset."""
+        if 0 <= offset < len(self.buffer):
+            self.buffer[offset] = value & 0xFF
     
     def patch_word(self, offset: int, value: int) -> None:
-        """
-        Patch a word at a specific offset.
-        
-        Args:
-            offset: Offset in output buffer.
-            value: New word value.
-        """
-        if self.endianness == 'little':
-            packed = struct.pack('<H', value & 0xFFFF)
-        else:
-            packed = struct.pack('>H', value & 0xFFFF)
-        self.output[offset:offset + 2] = packed
+        """Patch a word at specific offset."""
+        if 0 <= offset < len(self.buffer) - 1:
+            if self.endianness == 'little':
+                self.buffer[offset] = value & 0xFF
+                self.buffer[offset + 1] = (value >> 8) & 0xFF
+            else:
+                self.buffer[offset] = (value >> 8) & 0xFF
+                self.buffer[offset + 1] = value & 0xFF
+    
+    def reset(self, origin: int = 0) -> None:
+        """Reset emitter state."""
+        self.origin = origin
+        self.address = origin
+        self.buffer = bytearray()
     
     def to_binary(self) -> bytes:
-        """
-        Get output as binary bytes.
-        
-        Returns:
-            Binary output.
-        """
-        return bytes(self.output)
+        """Get binary output."""
+        return bytes(self.buffer)
     
     def to_hex_string(self) -> str:
-        """
-        Get output as hex string.
-        
-        Returns:
-            Hex string representation.
-        """
-        return self.output.hex().upper()
+        """Get output as hex string."""
+        return self.buffer.hex().upper()
     
     def to_hex_dump(self, bytes_per_line: int = 16) -> str:
-        """
-        Get output as formatted hex dump.
-        
-        Args:
-            bytes_per_line: Number of bytes per line.
-            
-        Returns:
-            Formatted hex dump string.
-        """
+        """Get formatted hex dump."""
         lines = []
-        for i in range(0, len(self.output), bytes_per_line):
+        for i in range(0, len(self.buffer), bytes_per_line):
             addr = self.origin + i
-            chunk = self.output[i:i + bytes_per_line]
+            chunk = self.buffer[i:i + bytes_per_line]
             hex_part = ' '.join(f'{b:02X}' for b in chunk)
             ascii_part = ''.join(chr(b) if 32 <= b < 127 else '.' for b in chunk)
             lines.append(f"{addr:04X}: {hex_part:<{bytes_per_line * 3}} {ascii_part}")
         return '\n'.join(lines)
     
     def to_intel_hex(self) -> str:
-        """
-        Get output as Intel HEX format.
-        
-        Returns:
-            Intel HEX string.
-        """
+        """Get Intel HEX format output."""
         lines = []
         addr = self.origin
         
-        for i in range(0, len(self.output), 16):
-            chunk = self.output[i:i + 16]
+        for i in range(0, len(self.buffer), 16):
+            chunk = self.buffer[i:i + 16]
             length = len(chunk)
             
-            # Build record: :LLAAAA00DD...CC
+            # :LLAAAA00DD...CC
             record = f':{length:02X}{addr:04X}00'
             for b in chunk:
                 record += f'{b:02X}'
             
-            # Calculate checksum
             checksum = length + (addr >> 8) + (addr & 0xFF) + sum(chunk)
             checksum = (~checksum + 1) & 0xFF
             record += f'{checksum:02X}'
@@ -205,51 +139,5 @@ class Emitter:
             lines.append(record)
             addr += 16
         
-        # End of file record
-        lines.append(':00000001FF')
+        lines.append(':00000001FF')  # EOF record
         return '\n'.join(lines)
-    
-    def to_listing(self, ir_nodes: List['IRNode']) -> str:
-        """
-        Generate assembly listing with addresses and machine code.
-        
-        Args:
-            ir_nodes: List of IR nodes from assembly.
-            
-        Returns:
-            Formatted listing string.
-        """
-        lines = [
-            "Assembly Listing",
-            "=" * 80,
-            f"{'Addr':<8} {'Machine Code':<24} {'Source':<40}",
-            "-" * 80
-        ]
-        
-        for node in ir_nodes:
-            addr_str = f"{node.address:04X}"
-            # Get machine code bytes for this node
-            start = node.address - self.origin
-            end = start + node.byte_width if hasattr(node, 'byte_width') else start + 1
-            if 0 <= start < len(self.output) and end <= len(self.output):
-                code_bytes = self.output[start:end]
-                code_str = ' '.join(f'{b:02X}' for b in code_bytes)
-            else:
-                code_str = ''
-            
-            source = node.source_line.strip() if node.source_line else ''
-            lines.append(f"{addr_str:<8} {code_str:<24} {source:<40}")
-        
-        lines.append("=" * 80)
-        return '\n'.join(lines)
-    
-    def reset(self, origin: int = 0) -> None:
-        """
-        Reset emitter state.
-        
-        Args:
-            origin: New origin address.
-        """
-        self.origin = origin
-        self.output = bytearray()
-        self.current_address = origin
