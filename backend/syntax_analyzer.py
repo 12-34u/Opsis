@@ -306,9 +306,9 @@ class SyntaxAnalyzer:
         if spec == 'IMM':
             return operand.is_immediate
         
-        # Memory specifications
+        # Memory specifications - labels are valid memory references
         if spec in ('MEM', 'M', 'MEM8', 'MEM16'):
-            return operand.is_memory
+            return operand.is_memory or operand.type == OperandType.LABEL
         
         if spec == 'R/M8':
             return (operand.is_register and operand.register in {
