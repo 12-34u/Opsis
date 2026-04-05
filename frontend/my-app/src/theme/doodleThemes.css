@@ -1,0 +1,218 @@
+/* Minimal "doodle sketchbook" light & dark — white/grey/black, bold borders */
+
+html[data-app-theme='doodle-light'] {
+  --bg-primary: #fafafa;
+  --bg-secondary: #ececec;
+  --bg-sidebar: #f0f0f0;
+  --bg-hover: #e0e0e0;
+  --bg-active: #d4d4d4;
+  --bg-statusbar: #e8e8e8;
+  --bg-menu: #f5f5f5;
+  --bg-terminal: #fafafa;
+  --bg-tab: #ececec;
+  --bg-tab-active: #ffffff;
+  --bg-input: #ffffff;
+
+  --text-primary: #0a0a0a;
+  --text-secondary: #303030;
+  --text-muted: #5c5c5c;
+  --text-bright: #000000;
+  --text-warning: #3d3d3d;
+  --text-error: #7f1d1d;
+  --text-success: #171717;
+  --text-info: #262626;
+
+  --accent-blue: #1a1a1a;
+  --accent-cyan: #2d2d2d;
+  --accent-green: #252525;
+  --accent-magenta: #333333;
+  --accent-orange: #111111;
+  --accent-red: #991b1b;
+  --accent-yellow: #404040;
+  --accent-purple: #292929;
+
+  --border-primary: #0a0a0a;
+  --border-secondary: #525252;
+  --border-highlight: #000000;
+  --border-color: #0a0a0a;
+
+  --file-saved: var(--text-primary);
+  --file-modified: var(--text-secondary);
+  --file-unsaved: var(--text-muted);
+  --file-error: var(--accent-red);
+
+  --btn-primary: #1a1a1a;
+  --btn-primary-hover: #404040;
+  --btn-success: #262626;
+  --btn-success-hover: #404040;
+  --btn-danger: #991b1b;
+
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: #a3a3a3;
+  --scrollbar-thumb-hover: #737373;
+
+  --shadow-sm: 3px 3px 0 #0a0a0a;
+  --shadow-md: 4px 4px 0 #0a0a0a;
+  --shadow-lg: 6px 6px 0 #0a0a0a;
+
+  --text-on-accent: #fafafa;
+
+  --overlay-blue: rgba(26, 26, 26, 0.06);
+  --overlay-blue-strong: rgba(26, 26, 26, 0.12);
+  --overlay-blue-border: rgba(26, 26, 26, 0.2);
+  --overlay-orange: rgba(26, 26, 26, 0.04);
+  --overlay-orange-strong: rgba(26, 26, 26, 0.1);
+  --overlay-orange-border: rgba(26, 26, 26, 0.15);
+  --overlay-green: rgba(26, 26, 26, 0.04);
+  --overlay-green-strong: rgba(26, 26, 26, 0.1);
+  --overlay-green-border: rgba(26, 26, 26, 0.15);
+  --overlay-red: rgba(127, 29, 29, 0.08);
+  --overlay-red-border: rgba(127, 29, 29, 0.25);
+  --overlay-purple: rgba(26, 26, 26, 0.08);
+  --overlay-neutral: rgba(0, 0, 0, 0.03);
+  --overlay-neutral-strong: rgba(0, 0, 0, 0.06);
+}
+
+html[data-app-theme='doodle-dark'] {
+  --bg-primary: #121212;
+  --bg-secondary: #0d0d0d;
+  --bg-sidebar: #0f0f0f;
+  --bg-hover: #1f1f1f;
+  --bg-active: #262626;
+  --bg-statusbar: #0a0a0a;
+  --bg-menu: #101010;
+  --bg-terminal: #121212;
+  --bg-tab: #141414;
+  --bg-tab-active: #1c1c1c;
+  --bg-input: #0d0d0d;
+
+  --text-primary: #ececec;
+  --text-secondary: #bdbdbd;
+  --text-muted: #8a8a8a;
+  --text-bright: #ffffff;
+  --text-warning: #d4d4d4;
+  --text-error: #fca5a5;
+  --text-success: #e5e5e5;
+  --text-info: #d4d4d4;
+
+  --accent-blue: #e5e5e5;
+  --accent-cyan: #d4d4d4;
+  --accent-green: #cfcfcf;
+  --accent-magenta: #bdbdbd;
+  --accent-orange: #f5f5f5;
+  --accent-red: #f87171;
+  --accent-yellow: #a3a3a3;
+  --accent-purple: #d4d4d4;
+
+  --border-primary: #404040;
+  --border-secondary: #262626;
+  --border-highlight: #737373;
+  --border-color: #525252;
+
+  --file-saved: var(--text-primary);
+  --file-modified: var(--text-secondary);
+  --file-unsaved: var(--text-muted);
+  --file-error: var(--accent-red);
+
+  --btn-primary: #e5e5e5;
+  --btn-primary-hover: #ffffff;
+  --btn-success: #d4d4d4;
+  --btn-success-hover: #f5f5f5;
+  --btn-danger: #f87171;
+
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: #525252;
+  --scrollbar-thumb-hover: #737373;
+
+  --shadow-sm: 2px 2px 0 #000000;
+  --shadow-md: 3px 3px 0 #000000;
+  --shadow-lg: 5px 5px 0 #000000;
+
+  --text-on-accent: #121212;
+
+  --overlay-blue: rgba(229, 229, 229, 0.06);
+  --overlay-blue-strong: rgba(229, 229, 229, 0.12);
+  --overlay-blue-border: rgba(229, 229, 229, 0.2);
+  --overlay-orange: rgba(245, 245, 245, 0.04);
+  --overlay-orange-strong: rgba(245, 245, 245, 0.1);
+  --overlay-orange-border: rgba(245, 245, 245, 0.15);
+  --overlay-green: rgba(212, 212, 212, 0.04);
+  --overlay-green-strong: rgba(212, 212, 212, 0.1);
+  --overlay-green-border: rgba(212, 212, 212, 0.15);
+  --overlay-red: rgba(248, 113, 113, 0.08);
+  --overlay-red-border: rgba(248, 113, 113, 0.25);
+  --overlay-purple: rgba(212, 212, 212, 0.08);
+  --overlay-neutral: rgba(255, 255, 255, 0.04);
+  --overlay-neutral-strong: rgba(255, 255, 255, 0.06);
+}
+
+/* Doodly UI chrome: slightly uneven radii + sketchy offset "stroke" feel */
+html[data-app-theme^='doodle-l'],
+html[data-app-theme='doodle-dark'] {
+  font-family: 'Comic Neue', 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive,
+    -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html[data-app-theme^='doodle-l'] .menu-bar,
+html[data-app-theme='doodle-dark'] .menu-bar {
+  border-bottom-width: 2px;
+}
+
+html[data-app-theme^='doodle-l'] .menu-button,
+html[data-app-theme='doodle-dark'] .menu-button,
+html[data-app-theme^='doodle-l'] .activity-btn,
+html[data-app-theme='doodle-dark'] .activity-btn,
+html[data-app-theme^='doodle-l'] .file-tab,
+html[data-app-theme='doodle-dark'] .file-tab {
+  border-radius: 6px 10px 8px 7px;
+}
+
+html[data-app-theme^='doodle-l'] .menu-dropdown,
+html[data-app-theme='doodle-dark'] .menu-dropdown {
+  border-width: 2px;
+  border-color: var(--border-primary);
+  border-radius: 8px 6px 10px 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+html[data-app-theme^='doodle-l'] .status-bar,
+html[data-app-theme='doodle-dark'] .status-bar {
+  border-top-width: 2px;
+}
+
+html[data-app-theme^='doodle-l'] .file-explorer,
+html[data-app-theme='doodle-dark'] .file-explorer {
+  border-right-width: 2px;
+}
+
+html[data-app-theme^='doodle-l'] .activity-bar,
+html[data-app-theme='doodle-dark'] .activity-bar {
+  border-right-width: 2px;
+}
+
+html[data-app-theme^='doodle-l'] .op-sidebar,
+html[data-app-theme='doodle-dark'] .op-sidebar {
+  border-left-width: 2px;
+}
+
+html[data-app-theme^='doodle-l'] .panel-resize-handle,
+html[data-app-theme='doodle-dark'] .panel-resize-handle {
+  border-top-width: 2px;
+}
+
+html[data-app-theme^='doodle-l'] .op-tl-step,
+html[data-app-theme='doodle-dark'] .op-tl-step {
+  border-width: 2px;
+  border-radius: 8px 5px 9px 6px;
+}
+
+html[data-app-theme^='doodle-l'] .op-reg-block,
+html[data-app-theme='doodle-dark'] .op-reg-block {
+  border-radius: 8px 6px 7px 9px;
+}
+
+html[data-app-theme^='doodle-l'] ::selection,
+html[data-app-theme='doodle-dark'] ::selection {
+  background-color: var(--text-muted);
+  color: var(--bg-primary);
+}

@@ -1,4 +1,6 @@
 @import './theme/tokyoNight.css';
+@import './theme/doodleThemes.css';
+@import './theme/doodleWhite.css';
 
 * {
   margin: 0;

@@ -4,7 +4,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #1e1e1e 0%, #252526 100%);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,20 +23,21 @@
 }
 
 .loading-logo svg {
-  filter: drop-shadow(0 0 20px rgba(86, 156, 214, 0.5));
+  color: var(--accent-blue);
+  filter: drop-shadow(2px 2px 0 var(--border-color, var(--border-primary)));
 }
 
 .loading-title {
   font-size: 2.5rem;
   font-weight: 600;
-  color: #cccccc;
+  color: var(--text-primary);
   margin: 0 0 10px 0;
   letter-spacing: -0.5px;
 }
 
 .loading-subtitle {
   font-size: 1rem;
-  color: #858585;
+  color: var(--text-muted);
   margin: 0 0 40px 0;
   font-weight: 400;
 }
@@ -44,7 +45,7 @@
 .loading-bar-container {
   width: 300px;
   height: 4px;
-  background: #3e3e42;
+  background: var(--border-secondary);
   border-radius: 2px;
   overflow: hidden;
   margin: 0 auto 20px;
@@ -52,15 +53,15 @@
 
 .loading-bar {
   height: 100%;
-  background: linear-gradient(90deg, #569cd6 0%, #4fc3f7 100%);
+  background: var(--accent-blue);
   border-radius: 2px;
   transition: width 0.3s ease-out;
-  box-shadow: 0 0 10px rgba(86, 156, 214, 0.5);
+  box-shadow: var(--shadow-sm, none);
 }
 
 .loading-text {
   font-size: 0.9rem;
-  color: #858585;
+  color: var(--text-muted);
   margin: 0;
   font-weight: 400;
 }

@@ -8,9 +8,8 @@ import BottomPanel from './BottomPanel';
 import StatusBar from './StatusBar';
 import OutputPanel from './OutputPanel';
 import './CodeEditor.css';
-import '../theme/tokyoNight.css';
 
-const CodeEditor = () => {
+const CodeEditor = ({ appTheme = 'tokyo-night', onAppThemeChange }) => {
   // File management
   const [openFiles, setOpenFiles] = useState([
     { 
@@ -366,6 +365,18 @@ HLT`,
       case 'toggleExplorer':
         setActiveView(activeView === 'explorer' ? null : 'explorer');
         break;
+      case 'themeTokyoNight':
+        onAppThemeChange?.('tokyo-night');
+        break;
+      case 'themeDoodleLight':
+        onAppThemeChange?.('doodle-light');
+        break;
+      case 'themeDoodleDark':
+        onAppThemeChange?.('doodle-dark');
+        break;
+      case 'themeDoodleWhite':
+        onAppThemeChange?.('doodle-white');
+        break;
       default:
         console.log('Menu action:', action);
     }
@@ -456,7 +467,7 @@ HLT`,
               value={currentFile?.content || ''}
               onChange={handleCodeChange}
               onMount={handleEditorDidMount}
-              theme="vs-dark"
+              theme={(appTheme === 'doodle-light' || appTheme === 'doodle-white') ? 'vs' : 'vs-dark'}
               options={{
                 fontSize: 14,
                 fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
