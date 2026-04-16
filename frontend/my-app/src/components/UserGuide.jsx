@@ -1,9 +1,7 @@
 import React from 'react';
 import { Joyride, STATUS } from 'react-joyride';
 
-const UserGuide = ({ run, setRun }) => {
-  if (!run) return null;
-
+const UserGuide = ({ run, setRun, startIndex = 0, appTheme = 'tokyo-night' }) => {
   const steps = [
     {
       target: 'body',
@@ -25,7 +23,7 @@ const UserGuide = ({ run, setRun }) => {
         </div>
       ),
       disableBeacon: true,
-      placement: 'right'
+      placement: 'center'
     },
     {
       target: '.op-sidebar',
@@ -63,11 +61,29 @@ const UserGuide = ({ run, setRun }) => {
     }
   ];
 
+  const activeSteps = startIndex > 0 ? steps.slice(startIndex) : steps;
+
   const handleJoyrideCallback = (data) => {
-    const { status } = data;
+    const { status, action } = data;
     const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
-    if (finishedStatuses.includes(status)) {
+    
+    if (finishedStatuses.includes(status) || action === 'close') {
       setRun(false);
+    }
+  };
+
+  const getThemeStyles = () => {
+    switch(appTheme) {
+      case 'tokyo-night':
+        return { backgroundColor: '#1a1b26', textColor: '#a9b1d6', primaryColor: '#7aa2f7', arrowColor: '#1a1b26', overlayColor: 'rgba(0, 0, 0, 0.6)' };
+      case 'doodle-light':
+        return { backgroundColor: '#ffffff', textColor: '#333333', primaryColor: '#ffb86c', arrowColor: '#ffffff', overlayColor: 'rgba(0, 0, 0, 0.4)' };
+      case 'doodle-dark':
+        return { backgroundColor: '#282a36', textColor: '#f8f8f2', primaryColor: '#bd93f9', arrowColor: '#282a36', overlayColor: 'rgba(0, 0, 0, 0.7)' };
+      case 'doodle-white':
+        return { backgroundColor: '#fdfdfd', textColor: '#222222', primaryColor: '#6c757d', arrowColor: '#fdfdfd', overlayColor: 'rgba(255, 255, 255, 0.6)' };
+      default:
+        return { backgroundColor: '#fff', textColor: '#222', primaryColor: '#6da9f8', arrowColor: '#fff', overlayColor: 'rgba(0, 0, 0, 0.5)' };
     }
   };
 
@@ -76,17 +92,11 @@ const UserGuide = ({ run, setRun }) => {
       callback={handleJoyrideCallback}
       continuous={true}
       run={run}
-      scrollToFirstStep={true}
       showProgress={true}
       showSkipButton={true}
-      steps={steps}
+      steps={activeSteps}
       styles={{
-        options: {
-          zIndex: 10000,
-          primaryColor: '#6da9f8', 
-          textColor: '#222',
-          backgroundColor: '#fff',
-        }
+        options: getThemeStyles()
       }}
       locale={{
         last: 'Finish',
