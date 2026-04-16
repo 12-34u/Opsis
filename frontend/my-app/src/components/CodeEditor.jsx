@@ -10,7 +10,7 @@ import OutputPanel from './OutputPanel';
 import UserGuide from './UserGuide';
 import './CodeEditor.css';
 
-const CodeEditor = ({ appTheme = 'tokyo-night', onAppThemeChange }) => {
+const CodeEditor = ({ appTheme = 'tokyo-night', onAppThemeChange, isGuest = false }) => {
   // File management
   const [openFiles, setOpenFiles] = useState([
     { 
@@ -50,6 +50,14 @@ HLT              ; Halt execution`,
   const dragStartYRef = useRef(0);
   const dragStartHeightRef = useRef(0);
   const [tourState, setTourState] = useState({ run: false, startIndex: 0, key: 0 });
+
+  // Auto-trigger tour for guests
+  useEffect(() => {
+    if (isGuest) {
+      // Small delay helps UI settle
+      setTimeout(() => setTourState(prev => ({ run: true, startIndex: 0, key: prev.key + 1 })), 500);
+    }
+  }, [isGuest]);
 
   // Panel resize handlers
   const handlePanelDragStart = useCallback((e) => {
