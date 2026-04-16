@@ -3,14 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { 
   createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword 
+  signInWithEmailAndPassword,
+  updateProfile
 } from 'firebase/auth';
 import './AuthPage.css';
 
 const AuthPage = () => {
   const navigate = useNavigate();
   const [isSignUP, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [loginIdentifier, setLoginIdentifier] = useState(''); // Can be username or email
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,6 +30,10 @@ const AuthPage = () => {
     setError('');
     
     if (isSignUP) {
+      if (!username.trim()) {
+        setError("Username is required.");
+        return;
+      }
       const pwdError = validatePassword(password);
       if (pwdError) {
         setError(pwdError);
@@ -38,14 +44,38 @@ const AuthPage = () => {
     setLoading(true);
     try {
       if (isSignUP) {
-        await createUserWithEmailAndPassword(auth, email, password);
+        // Sign Up Flow
+        const userCredential = await createUserWithEmailAndPassword(auth, loginIdentifier, password);
+        
+        // Update user profile with Username
+        await updateProfile(userCredential.user, {
+          displayName: username
+        });
+
+        // Store mapping in localStorage so they can login with Username later locally
+        localStorage.setItem(`opsis_username_email_${username}`, loginIdentifier);
+        
+        navigate('/editor', { state: { isGuest: false, userEmail: loginIdentifier } });
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        // Log In Flow
+        let targetEmail = loginIdentifier;
+        
+        // If they didn't type an '@', assume it's a Username and lookup their email locally
+        if (!targetEmail.includes('@')) {
+          const cachedEmail = localStorage.getItem(`opsis_username_email_${targetEmail}`);
+          if (cachedEmail) {
+            targetEmail = cachedEmail;
+          } else {
+            throw new Error("Local username cache not found. Please log in using your Email Address.");
+          }
+        }
+        
+        await signInWithEmailAndPassword(auth, targetEmail, password);
+        
+        navigate('/editor', { state: { isGuest: false, userEmail: targetEmail } });
       }
-      // Successful auth -> route to editor
-      navigate('/editor', { state: { isGuest: false } });
     } catch (err) {
-      setError(err.message.replace('Firebase: ', '')); // Polish error message
+      setError(err.message.replace('Firebase: ', ''));
     } finally {
       setLoading(false);
     }
@@ -61,14 +91,27 @@ const AuthPage = () => {
         {error && <div className="auth-error">{error}</div>}
         
         <form onSubmit={handleAuth} className="auth-form">
+          {isSignUP && (
+            <div className="input-group">
+              <label>Username</label>
+              <input 
+                type="text" 
+                required 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Choose a username"
+              />
+            </div>
+          )}
+          
           <div className="input-group">
-            <label>Email</label>
+            <label>{isSignUP ? 'Email' : 'Username or Email'}</label>
             <input 
-              type="email" 
+              type={isSignUP ? 'email' : 'text'} 
               required 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              value={loginIdentifier}
+              onChange={(e) => setLoginIdentifier(e.target.value)}
+              placeholder={isSignUP ? 'Enter your email' : 'Username or Email'}
             />
           </div>
           
@@ -98,6 +141,10 @@ const AuthPage = () => {
             onClick={() => {
               setIsSignUp(!isSignUP);
               setError('');
+              // Reset fields when toggling
+              setLoginIdentifier('');
+              setPassword('');
+              setUsername('');
             }}
           >
             {isSignUP ? 'Log In' : 'Sign Up'}

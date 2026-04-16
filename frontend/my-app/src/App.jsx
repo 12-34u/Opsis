@@ -24,12 +24,14 @@ const EditorWrapper = ({ appTheme, setAppTheme }) => {
   // We can pass down the isGuest flag based on location state. 
   // It defaults to false unless explicitly set to true.
   const isGuest = location.state?.isGuest || false;
+  const userEmail = location.state?.userEmail || '';
 
   return (
     <CodeEditor 
       appTheme={appTheme} 
       onAppThemeChange={setAppTheme} 
       isGuest={isGuest} 
+      userEmail={userEmail}
     />
   );
 };
