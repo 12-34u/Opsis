@@ -7,9 +7,10 @@ import FileTabs from './FileTabs';
 import BottomPanel from './BottomPanel';
 import StatusBar from './StatusBar';
 import OutputPanel from './OutputPanel';
+import UserGuide from './UserGuide';
 import './CodeEditor.css';
 
-const CodeEditor = ({ appTheme = 'tokyo-night', onAppThemeChange }) => {
+const CodeEditor = ({ appTheme = 'tokyo-night', onAppThemeChange, isGuest = false }) => {
   // File management
   const [openFiles, setOpenFiles] = useState([
     { 
@@ -48,6 +49,15 @@ HLT              ; Halt execution`,
   const isDraggingRef = useRef(false);
   const dragStartYRef = useRef(0);
   const dragStartHeightRef = useRef(0);
+  const [tourState, setTourState] = useState({ run: false, startIndex: 0, key: 0 });
+
+  // Auto-trigger tour for guests
+  useEffect(() => {
+    if (isGuest) {
+      // Small delay helps UI settle
+      setTimeout(() => setTourState(prev => ({ run: true, startIndex: 0, key: prev.key + 1 })), 500);
+    }
+  }, [isGuest]);
 
   // Panel resize handlers
   const handlePanelDragStart = useCallback((e) => {
@@ -377,6 +387,10 @@ HLT`,
       case 'themeDoodleWhite':
         onAppThemeChange?.('doodle-white');
         break;
+      case 'guidedTour':
+        setTourState(prev => ({ run: false, startIndex: 1, key: prev.key + 1 }));
+        setTimeout(() => setTourState(prev => ({ ...prev, run: true })), 50);
+        break;
       default:
         console.log('Menu action:', action);
     }
@@ -420,6 +434,13 @@ HLT`,
 
   return (
     <div className="vscode-container">
+      <UserGuide 
+        key={`tour-${tourState.key}`}
+        run={tourState.run} 
+        setRun={(val) => setTourState(prev => ({ ...prev, run: val }))} 
+        startIndex={tourState.startIndex}
+        appTheme={appTheme}
+      />
       {/* Top Menu Bar */}
       <MenuBar onAction={handleMenuAction} />
       

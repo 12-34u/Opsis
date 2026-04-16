@@ -89,6 +89,8 @@ const MenuBar = ({ onAction }) => {
         { label: 'Welcome', action: 'welcome' },
         { label: 'Documentation', action: 'docs' },
         { type: 'separator' },
+        { label: 'Guided Tour', action: 'guidedTour' },
+        { type: 'separator' },
         { label: 'About', action: 'about' },
       ]
     }
