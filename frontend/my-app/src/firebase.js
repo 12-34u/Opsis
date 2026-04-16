@@ -3,15 +3,15 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Your web app's Firebase configuration
+// Your web app's Firebase configuration — loaded from .env
 const firebaseConfig = {
-  apiKey: "AIzaSyDf3J0sIAAks0B9W5i5mOIDBWDM4andWT4",
-  authDomain: "opsis-editor.firebaseapp.com",
-  projectId: "opsis-editor",
-  storageBucket: "opsis-editor.firebasestorage.app",
-  messagingSenderId: "772455423288",
-  appId: "1:772455423288:web:80643c650300ed4a36b5cd",
-  measurementId: "G-FFQ39TN6MQ"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase

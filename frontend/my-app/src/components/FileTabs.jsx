@@ -9,7 +9,7 @@ const FileTabs = ({ files, activeFile, onTabClick, onTabClose, onNewFile }) => {
     const icons = {
       js: '📜', jsx: '⚛️', ts: '💙', tsx: '⚛️',
       py: '🐍', java: '☕', html: '🌐', css: '🎨',
-      json: '📋', md: '📝', txt: '📄'
+      json: '📋', md: '📝', txt: '📄', asm: '⚙️'
     };
     return icons[ext] || '📄';
   };
@@ -19,9 +19,9 @@ const FileTabs = ({ files, activeFile, onTabClick, onTabClose, onNewFile }) => {
       <div className="tabs-container">
         {files.map((file, idx) => (
           <div
-            key={file.path || idx}
-            className={`file-tab ${activeFile?.path === file.path ? 'active' : ''} ${file.isModified ? 'modified' : ''}`}
-            onClick={() => onTabClick(file)}
+            key={idx}
+            className={`file-tab ${activeFile === file ? 'active' : ''} ${file.isModified ? 'modified' : ''}`}
+            onClick={() => onTabClick(file, idx)}
             onMouseEnter={() => setHoveredTab(idx)}
             onMouseLeave={() => setHoveredTab(null)}
           >

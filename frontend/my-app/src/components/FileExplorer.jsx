@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './FileExplorer.css';
 
 const FileExplorer = ({ onFileSelect, currentFile, openFiles }) => {
@@ -46,10 +46,6 @@ const FileExplorer = ({ onFileSelect, currentFile, openFiles }) => {
     }
   };
 
-  const handleOpenFolder = async () => {
-    // Placeholder for folder opening
-    console.log('Open folder functionality coming soon...');
-  };
 
   return (
     <div className={`file-explorer ${isCollapsed ? 'collapsed' : ''}`}>
@@ -66,9 +62,6 @@ const FileExplorer = ({ onFileSelect, currentFile, openFiles }) => {
         <div className="explorer-actions">
           <button className="icon-btn" onClick={handleOpenFile} title="Open File">
             <span>📄</span>
-          </button>
-          <button className="icon-btn" onClick={handleOpenFolder} title="Open Folder">
-            <span>📁</span>
           </button>
         </div>
       </div>
@@ -132,22 +125,15 @@ const FileExplorer = ({ onFileSelect, currentFile, openFiles }) => {
                 <span className="action-icon">📂</span>
                 <span className="action-text">Open File</span>
               </button>
-              <button className="action-btn" onClick={handleOpenFolder}>
-                <span className="action-icon">📁</span>
-                <span className="action-text">Open Folder</span>
-              </button>
             </div>
           </div>
 
           {/* Getting Started */}
           {openFiles.length === 0 && recentFiles.length === 0 && (
             <div className="explorer-empty">
-              <p className="empty-message">You have not yet opened a file or folder.</p>
+              <p className="empty-message">You have not yet opened a file.</p>
               <button className="primary-btn" onClick={handleOpenFile}>
                 Open File
-              </button>
-              <button className="secondary-btn" onClick={handleOpenFolder}>
-                Open Folder
               </button>
             </div>
           )}

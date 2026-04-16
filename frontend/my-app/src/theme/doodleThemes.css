@@ -2,217 +2,220 @@
 
 html[data-app-theme='doodle-light'] {
   --bg-primary: #fafafa;
-  --bg-secondary: #ececec;
-  --bg-sidebar: #f0f0f0;
-  --bg-hover: #e0e0e0;
-  --bg-active: #d4d4d4;
-  --bg-statusbar: #e8e8e8;
+  --bg-secondary: #f0f0f0;
+  --bg-sidebar: #f4f4f4;
+  --bg-hover: #e8e8e8;
+  --bg-active: #dcdcdc;
+  --bg-statusbar: #ececec;
   --bg-menu: #f5f5f5;
   --bg-terminal: #fafafa;
-  --bg-tab: #ececec;
+  --bg-tab: #f0f0f0;
   --bg-tab-active: #ffffff;
   --bg-input: #ffffff;
 
-  --text-primary: #0a0a0a;
-  --text-secondary: #303030;
-  --text-muted: #5c5c5c;
+  --text-primary: #1a1a1a;
+  --text-secondary: #404040;
+  --text-muted: #808080;
   --text-bright: #000000;
-  --text-warning: #3d3d3d;
-  --text-error: #7f1d1d;
-  --text-success: #171717;
-  --text-info: #262626;
+  --text-warning: #6b5300;
+  --text-error: #b91c1c;
+  --text-success: #15803d;
+  --text-info: #1d4ed8;
 
-  --accent-blue: #1a1a1a;
-  --accent-cyan: #2d2d2d;
-  --accent-green: #252525;
-  --accent-magenta: #333333;
-  --accent-orange: #111111;
-  --accent-red: #991b1b;
-  --accent-yellow: #404040;
-  --accent-purple: #292929;
+  --accent-blue: #2563eb;
+  --accent-cyan: #0891b2;
+  --accent-green: #16a34a;
+  --accent-magenta: #9333ea;
+  --accent-orange: #ea580c;
+  --accent-red: #dc2626;
+  --accent-yellow: #ca8a04;
+  --accent-purple: #7c3aed;
 
-  --border-primary: #0a0a0a;
-  --border-secondary: #525252;
-  --border-highlight: #000000;
-  --border-color: #0a0a0a;
+  /* Borders — consistent, clean, not too heavy */
+  --border-primary: #c8c8c8;
+  --border-secondary: #e0e0e0;
+  --border-highlight: #a0a0a0;
+  --border-color: #c8c8c8;
 
   --file-saved: var(--text-primary);
-  --file-modified: var(--text-secondary);
-  --file-unsaved: var(--text-muted);
+  --file-modified: var(--accent-orange);
+  --file-unsaved: var(--accent-cyan);
   --file-error: var(--accent-red);
 
-  --btn-primary: #1a1a1a;
-  --btn-primary-hover: #404040;
-  --btn-success: #262626;
-  --btn-success-hover: #404040;
-  --btn-danger: #991b1b;
+  --btn-primary: #2563eb;
+  --btn-primary-hover: #3b82f6;
+  --btn-success: #16a34a;
+  --btn-success-hover: #22c55e;
+  --btn-danger: #dc2626;
 
   --scrollbar-bg: transparent;
-  --scrollbar-thumb: #a3a3a3;
-  --scrollbar-thumb-hover: #737373;
+  --scrollbar-thumb: #c0c0c0;
+  --scrollbar-thumb-hover: #a0a0a0;
 
-  --shadow-sm: 3px 3px 0 #0a0a0a;
-  --shadow-md: 4px 4px 0 #0a0a0a;
-  --shadow-lg: 6px 6px 0 #0a0a0a;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
 
-  --text-on-accent: #fafafa;
+  --text-on-accent: #ffffff;
 
-  --overlay-blue: rgba(26, 26, 26, 0.06);
-  --overlay-blue-strong: rgba(26, 26, 26, 0.12);
-  --overlay-blue-border: rgba(26, 26, 26, 0.2);
-  --overlay-orange: rgba(26, 26, 26, 0.04);
-  --overlay-orange-strong: rgba(26, 26, 26, 0.1);
-  --overlay-orange-border: rgba(26, 26, 26, 0.15);
-  --overlay-green: rgba(26, 26, 26, 0.04);
-  --overlay-green-strong: rgba(26, 26, 26, 0.1);
-  --overlay-green-border: rgba(26, 26, 26, 0.15);
-  --overlay-red: rgba(127, 29, 29, 0.08);
-  --overlay-red-border: rgba(127, 29, 29, 0.25);
-  --overlay-purple: rgba(26, 26, 26, 0.08);
+  --overlay-blue: rgba(37, 99, 235, 0.06);
+  --overlay-blue-strong: rgba(37, 99, 235, 0.12);
+  --overlay-blue-border: rgba(37, 99, 235, 0.2);
+  --overlay-orange: rgba(234, 88, 12, 0.06);
+  --overlay-orange-strong: rgba(234, 88, 12, 0.12);
+  --overlay-orange-border: rgba(234, 88, 12, 0.18);
+  --overlay-green: rgba(22, 163, 74, 0.06);
+  --overlay-green-strong: rgba(22, 163, 74, 0.12);
+  --overlay-green-border: rgba(22, 163, 74, 0.18);
+  --overlay-red: rgba(220, 38, 38, 0.08);
+  --overlay-red-border: rgba(220, 38, 38, 0.2);
+  --overlay-purple: rgba(124, 58, 237, 0.08);
   --overlay-neutral: rgba(0, 0, 0, 0.03);
   --overlay-neutral-strong: rgba(0, 0, 0, 0.06);
 }
 
 html[data-app-theme='doodle-dark'] {
-  --bg-primary: #121212;
-  --bg-secondary: #0d0d0d;
-  --bg-sidebar: #0f0f0f;
-  --bg-hover: #1f1f1f;
+  --bg-primary: #141414;
+  --bg-secondary: #0e0e0e;
+  --bg-sidebar: #111111;
+  --bg-hover: #1e1e1e;
   --bg-active: #262626;
-  --bg-statusbar: #0a0a0a;
-  --bg-menu: #101010;
-  --bg-terminal: #121212;
-  --bg-tab: #141414;
-  --bg-tab-active: #1c1c1c;
-  --bg-input: #0d0d0d;
+  --bg-statusbar: #0c0c0c;
+  --bg-menu: #111111;
+  --bg-terminal: #141414;
+  --bg-tab: #161616;
+  --bg-tab-active: #1e1e1e;
+  --bg-input: #0e0e0e;
 
-  --text-primary: #ececec;
-  --text-secondary: #bdbdbd;
-  --text-muted: #8a8a8a;
+  --text-primary: #e4e4e4;
+  --text-secondary: #b0b0b0;
+  --text-muted: #707070;
   --text-bright: #ffffff;
-  --text-warning: #d4d4d4;
-  --text-error: #fca5a5;
-  --text-success: #e5e5e5;
-  --text-info: #d4d4d4;
+  --text-warning: #fbbf24;
+  --text-error: #fb7185;
+  --text-success: #4ade80;
+  --text-info: #60a5fa;
 
-  --accent-blue: #e5e5e5;
-  --accent-cyan: #d4d4d4;
-  --accent-green: #cfcfcf;
-  --accent-magenta: #bdbdbd;
-  --accent-orange: #f5f5f5;
-  --accent-red: #f87171;
-  --accent-yellow: #a3a3a3;
-  --accent-purple: #d4d4d4;
+  --accent-blue: #60a5fa;
+  --accent-cyan: #22d3ee;
+  --accent-green: #4ade80;
+  --accent-magenta: #c084fc;
+  --accent-orange: #fb923c;
+  --accent-red: #fb7185;
+  --accent-yellow: #fbbf24;
+  --accent-purple: #a78bfa;
 
-  --border-primary: #404040;
-  --border-secondary: #262626;
-  --border-highlight: #737373;
-  --border-color: #525252;
+  /* Borders — subtle, uniform */
+  --border-primary: #2a2a2a;
+  --border-secondary: #1e1e1e;
+  --border-highlight: #404040;
+  --border-color: #2a2a2a;
 
   --file-saved: var(--text-primary);
-  --file-modified: var(--text-secondary);
-  --file-unsaved: var(--text-muted);
+  --file-modified: var(--accent-orange);
+  --file-unsaved: var(--accent-cyan);
   --file-error: var(--accent-red);
 
-  --btn-primary: #e5e5e5;
-  --btn-primary-hover: #ffffff;
-  --btn-success: #d4d4d4;
-  --btn-success-hover: #f5f5f5;
-  --btn-danger: #f87171;
+  --btn-primary: #60a5fa;
+  --btn-primary-hover: #93c5fd;
+  --btn-success: #4ade80;
+  --btn-success-hover: #86efac;
+  --btn-danger: #fb7185;
 
   --scrollbar-bg: transparent;
-  --scrollbar-thumb: #525252;
-  --scrollbar-thumb-hover: #737373;
+  --scrollbar-thumb: #383838;
+  --scrollbar-thumb-hover: #505050;
 
-  --shadow-sm: 2px 2px 0 #000000;
-  --shadow-md: 3px 3px 0 #000000;
-  --shadow-lg: 5px 5px 0 #000000;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.6);
 
-  --text-on-accent: #121212;
+  --text-on-accent: #0e0e0e;
 
-  --overlay-blue: rgba(229, 229, 229, 0.06);
-  --overlay-blue-strong: rgba(229, 229, 229, 0.12);
-  --overlay-blue-border: rgba(229, 229, 229, 0.2);
-  --overlay-orange: rgba(245, 245, 245, 0.04);
-  --overlay-orange-strong: rgba(245, 245, 245, 0.1);
-  --overlay-orange-border: rgba(245, 245, 245, 0.15);
-  --overlay-green: rgba(212, 212, 212, 0.04);
-  --overlay-green-strong: rgba(212, 212, 212, 0.1);
-  --overlay-green-border: rgba(212, 212, 212, 0.15);
-  --overlay-red: rgba(248, 113, 113, 0.08);
-  --overlay-red-border: rgba(248, 113, 113, 0.25);
-  --overlay-purple: rgba(212, 212, 212, 0.08);
-  --overlay-neutral: rgba(255, 255, 255, 0.04);
+  --overlay-blue: rgba(96, 165, 250, 0.08);
+  --overlay-blue-strong: rgba(96, 165, 250, 0.14);
+  --overlay-blue-border: rgba(96, 165, 250, 0.22);
+  --overlay-orange: rgba(251, 146, 60, 0.06);
+  --overlay-orange-strong: rgba(251, 146, 60, 0.12);
+  --overlay-orange-border: rgba(251, 146, 60, 0.18);
+  --overlay-green: rgba(74, 222, 128, 0.06);
+  --overlay-green-strong: rgba(74, 222, 128, 0.12);
+  --overlay-green-border: rgba(74, 222, 128, 0.18);
+  --overlay-red: rgba(251, 113, 133, 0.08);
+  --overlay-red-border: rgba(251, 113, 133, 0.22);
+  --overlay-purple: rgba(167, 139, 250, 0.1);
+  --overlay-neutral: rgba(255, 255, 255, 0.03);
   --overlay-neutral-strong: rgba(255, 255, 255, 0.06);
 }
 
-/* Doodly UI chrome: slightly uneven radii + sketchy offset "stroke" feel */
-html[data-app-theme^='doodle-l'],
+/* ─── Shared Doodle Chrome (light + dark) ─── */
+html[data-app-theme='doodle-light'],
 html[data-app-theme='doodle-dark'] {
   font-family: 'Comic Neue', 'Segoe Print', 'Bradley Hand', 'Comic Sans MS', cursive,
     -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-html[data-app-theme^='doodle-l'] .menu-bar,
+/* Consistent 1px borders everywhere — no doubling */
+html[data-app-theme='doodle-light'] .menu-bar,
 html[data-app-theme='doodle-dark'] .menu-bar {
-  border-bottom-width: 2px;
+  border-bottom: 1px solid var(--border-primary);
 }
 
-html[data-app-theme^='doodle-l'] .menu-button,
-html[data-app-theme='doodle-dark'] .menu-button,
-html[data-app-theme^='doodle-l'] .activity-btn,
-html[data-app-theme='doodle-dark'] .activity-btn,
-html[data-app-theme^='doodle-l'] .file-tab,
-html[data-app-theme='doodle-dark'] .file-tab {
-  border-radius: 6px 10px 8px 7px;
-}
-
-html[data-app-theme^='doodle-l'] .menu-dropdown,
-html[data-app-theme='doodle-dark'] .menu-dropdown {
-  border-width: 2px;
-  border-color: var(--border-primary);
-  border-radius: 8px 6px 10px 8px;
-  box-shadow: var(--shadow-sm);
-}
-
-html[data-app-theme^='doodle-l'] .status-bar,
+html[data-app-theme='doodle-light'] .status-bar,
 html[data-app-theme='doodle-dark'] .status-bar {
-  border-top-width: 2px;
+  border-top: 1px solid var(--border-primary);
 }
 
-html[data-app-theme^='doodle-l'] .file-explorer,
+html[data-app-theme='doodle-light'] .file-explorer,
 html[data-app-theme='doodle-dark'] .file-explorer {
-  border-right-width: 2px;
+  border-right: 1px solid var(--border-primary);
 }
 
-html[data-app-theme^='doodle-l'] .activity-bar,
+html[data-app-theme='doodle-light'] .activity-bar,
 html[data-app-theme='doodle-dark'] .activity-bar {
-  border-right-width: 2px;
+  border-right: 1px solid var(--border-primary);
 }
 
-html[data-app-theme^='doodle-l'] .op-sidebar,
+html[data-app-theme='doodle-light'] .op-sidebar,
 html[data-app-theme='doodle-dark'] .op-sidebar {
-  border-left-width: 2px;
+  border-left: 1px solid var(--border-primary);
 }
 
-html[data-app-theme^='doodle-l'] .panel-resize-handle,
+html[data-app-theme='doodle-light'] .panel-resize-handle,
 html[data-app-theme='doodle-dark'] .panel-resize-handle {
-  border-top-width: 2px;
+  border-top: 1px solid var(--border-primary);
 }
 
-html[data-app-theme^='doodle-l'] .op-tl-step,
+/* Slightly rounded "hand-drawn" feel on interactive elements */
+html[data-app-theme='doodle-light'] .menu-button,
+html[data-app-theme='doodle-dark'] .menu-button,
+html[data-app-theme='doodle-light'] .activity-btn,
+html[data-app-theme='doodle-dark'] .activity-btn,
+html[data-app-theme='doodle-light'] .file-tab,
+html[data-app-theme='doodle-dark'] .file-tab {
+  border-radius: 5px;
+}
+
+html[data-app-theme='doodle-light'] .menu-dropdown,
+html[data-app-theme='doodle-dark'] .menu-dropdown {
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+}
+
+html[data-app-theme='doodle-light'] .op-tl-step,
 html[data-app-theme='doodle-dark'] .op-tl-step {
-  border-width: 2px;
-  border-radius: 8px 5px 9px 6px;
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
 }
 
-html[data-app-theme^='doodle-l'] .op-reg-block,
+html[data-app-theme='doodle-light'] .op-reg-block,
 html[data-app-theme='doodle-dark'] .op-reg-block {
-  border-radius: 8px 6px 7px 9px;
+  border-radius: 6px;
 }
 
-html[data-app-theme^='doodle-l'] ::selection,
+html[data-app-theme='doodle-light'] ::selection,
 html[data-app-theme='doodle-dark'] ::selection {
-  background-color: var(--text-muted);
-  color: var(--bg-primary);
+  background-color: var(--accent-blue);
+  color: var(--text-on-accent);
 }

@@ -9,6 +9,7 @@ import StatusBar from './StatusBar';
 import OutputPanel from './OutputPanel';
 import UserGuide from './UserGuide';
 import CloudModal from './CloudModal';
+import AIPanel from './AIPanel';
 import './CodeEditor.css';
 
 const CodeEditor = ({ appTheme = 'tokyo-night', onAppThemeChange, isGuest = false, userEmail = '' }) => {
@@ -52,6 +53,7 @@ HLT              ; Halt execution`,
   const dragStartHeightRef = useRef(0);
   const [tourState, setTourState] = useState({ run: false, startIndex: 0, key: 0 });
   const [cloudModalConfig, setCloudModalConfig] = useState({ isOpen: false, mode: 'load' });
+  const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
 
   // Auto-trigger tour for guests vs users
   useEffect(() => {
@@ -455,6 +457,9 @@ HLT`,
         setTourState(prev => ({ run: false, startIndex: 1, key: prev.key + 1 }));
         setTimeout(() => setTourState(prev => ({ ...prev, run: true })), 50);
         break;
+      case 'aiAnalyze':
+        setIsAIPanelOpen(true);
+        break;
       default:
         console.log('Menu action:', action);
     }
@@ -508,6 +513,11 @@ HLT`,
         onLoadComplete={handleCloudLoadComplete}
         onSaveComplete={handleCloudSaveComplete}
       />
+      <AIPanel
+        code={currentFile?.content || ''}
+        isOpen={isAIPanelOpen}
+        onClose={() => setIsAIPanelOpen(false)}
+      />
       <UserGuide 
         key={`tour-${tourState.key}`}
         run={tourState.run} 
@@ -516,7 +526,7 @@ HLT`,
         appTheme={appTheme}
       />
       {/* Top Menu Bar */}
-      <MenuBar onAction={handleMenuAction} />
+      <MenuBar onAction={handleMenuAction} isGuest={isGuest} />
       
       {/* Main Content Area */}
       <div className="vscode-main">
@@ -546,9 +556,8 @@ HLT`,
           <FileTabs 
             files={openFiles}
             activeFile={currentFile}
-            onTabClick={(file) => {
-              const index = openFiles.findIndex(f => f.path === file.path);
-              setActiveFileIndex(index);
+            onTabClick={(file, idx) => {
+              setActiveFileIndex(idx);
             }}
             onTabClose={handleCloseTab}
             onNewFile={handleNewFile}
