@@ -7,6 +7,7 @@ import FileTabs from './FileTabs';
 import BottomPanel from './BottomPanel';
 import StatusBar from './StatusBar';
 import OutputPanel from './OutputPanel';
+import UserGuide from './UserGuide';
 import './CodeEditor.css';
 
 const CodeEditor = ({ appTheme = 'tokyo-night', onAppThemeChange }) => {
@@ -48,6 +49,7 @@ HLT              ; Halt execution`,
   const isDraggingRef = useRef(false);
   const dragStartYRef = useRef(0);
   const dragStartHeightRef = useRef(0);
+  const [runTour, setRunTour] = useState(false);
 
   // Panel resize handlers
   const handlePanelDragStart = useCallback((e) => {
@@ -377,6 +379,9 @@ HLT`,
       case 'themeDoodleWhite':
         onAppThemeChange?.('doodle-white');
         break;
+      case 'guidedTour':
+        setRunTour(true);
+        break;
       default:
         console.log('Menu action:', action);
     }
@@ -420,6 +425,7 @@ HLT`,
 
   return (
     <div className="vscode-container">
+      <UserGuide run={runTour} setRun={setRunTour} />
       {/* Top Menu Bar */}
       <MenuBar onAction={handleMenuAction} />
       
