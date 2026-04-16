@@ -15,9 +15,16 @@ function configureContentSecurityPolicy() {
   const devWsOrigin = devOrigin ? devOrigin.replace('http://', 'ws://').replace('https://', 'wss://') : null;
   const monacoCdnOrigin = 'https://cdn.jsdelivr.net';
 
-  const scriptSrc = ["'self'", monacoCdnOrigin];
+  const scriptSrc = ["'self'", monacoCdnOrigin, "https://apis.google.com"];
   const styleSrc = ["'self'", "'unsafe-inline'", monacoCdnOrigin];
-  const connectSrc = ["'self'", monacoCdnOrigin];
+  const connectSrc = [
+    "'self'", 
+    monacoCdnOrigin, 
+    "https://*.googleapis.com", 
+    "https://*.firebaseapp.com",
+    "https://*.firebaseio.com",
+    "wss://*.firebaseio.com"
+  ];
   const imgSrc = ["'self'", 'data:', 'blob:'];
   const fontSrc = ["'self'", 'data:'];
   const workerSrc = ["'self'", 'blob:'];

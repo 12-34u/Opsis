@@ -1,18 +1,16 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-// Replace these with your actual Firebase project config values later
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDf3J0sIAAks0B9W5i5mOIDBWDM4andWT4",
+  authDomain: "opsis-editor.firebaseapp.com",
+  projectId: "opsis-editor",
+  storageBucket: "opsis-editor.firebasestorage.app",
+  messagingSenderId: "772455423288",
+  appId: "1:772455423288:web:80643c650300ed4a36b5cd",
+  measurementId: "G-FFQ39TN6MQ"
 };
 
 // Initialize Firebase
