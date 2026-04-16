@@ -1,14 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Joyride, STATUS } from 'react-joyride';
 
 const UserGuide = ({ run, setRun }) => {
-
-  useEffect(() => {
-    const isTourSeen = localStorage.getItem('opsis-tour-seen');
-    if (!isTourSeen) {
-      setRun(true);
-    }
-  }, [setRun]);
+  if (!run) return null;
 
   const steps = [
     {
@@ -74,19 +68,17 @@ const UserGuide = ({ run, setRun }) => {
     const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
     if (finishedStatuses.includes(status)) {
       setRun(false);
-      localStorage.setItem('opsis-tour-seen', 'true');
     }
   };
 
   return (
     <Joyride
       callback={handleJoyrideCallback}
-      continuous
-      hideCloseButton={false}
+      continuous={true}
       run={run}
-      scrollToFirstStep
-      showProgress
-      showSkipButton
+      scrollToFirstStep={true}
+      showProgress={true}
+      showSkipButton={true}
       steps={steps}
       styles={{
         options: {
@@ -94,9 +86,6 @@ const UserGuide = ({ run, setRun }) => {
           primaryColor: '#6da9f8', 
           textColor: '#222',
           backgroundColor: '#fff',
-        },
-        buttonClose: {
-          display: 'none',
         }
       }}
       locale={{
