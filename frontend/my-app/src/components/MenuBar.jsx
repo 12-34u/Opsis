@@ -1,19 +1,24 @@
 import { useState } from 'react';
 import './MenuBar.css';
 
-const MenuBar = ({ onAction }) => {
+const MenuBar = ({ onAction, isGuest = true }) => {
   const [activeMenu, setActiveMenu] = useState(null);
+
+  const isCloud = !isGuest;
 
   const menus = [
     {
       label: 'File',
       items: [
         { label: 'New File', shortcut: 'Ctrl+N', action: 'new' },
-        { label: 'Open File...', shortcut: 'Ctrl+O', action: 'open' },
-        { label: 'Open Folder...', shortcut: 'Ctrl+K Ctrl+O', action: 'openFolder' },
+        { label: isCloud ? 'Open from Cloud ' : 'Open File...', shortcut: 'Ctrl+O', action: 'open' },
         { type: 'separator' },
-        { label: 'Save', shortcut: 'Ctrl+S', action: 'save' },
-        { label: 'Save As...', shortcut: 'Ctrl+Shift+S', action: 'saveAs' },
+        { label: isCloud ? 'Save to Cloud ' : 'Save', shortcut: 'Ctrl+S', action: 'save' },
+        { label: isCloud ? 'Save As (Cloud) ' : 'Save As...', shortcut: 'Ctrl+Shift+S', action: 'saveAs' },
+        ...(isGuest ? [
+          { type: 'separator' },
+          { label: 'Save Locally...', action: 'saveLocal' },
+        ] : []),
         { type: 'separator' },
         { label: 'Close Editor', shortcut: 'Ctrl+W', action: 'close' },
       ]
@@ -90,6 +95,8 @@ const MenuBar = ({ onAction }) => {
         { label: 'Documentation', action: 'docs' },
         { type: 'separator' },
         { label: 'Guided Tour', action: 'guidedTour' },
+        { type: 'separator' },
+        { label: '✨ AI Analyze Code', action: 'aiAnalyze' },
         { type: 'separator' },
         { label: 'About', action: 'about' },
       ]

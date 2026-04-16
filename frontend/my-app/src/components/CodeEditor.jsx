@@ -8,9 +8,11 @@ import BottomPanel from './BottomPanel';
 import StatusBar from './StatusBar';
 import OutputPanel from './OutputPanel';
 import UserGuide from './UserGuide';
+import CloudModal from './CloudModal';
+import AIPanel from './AIPanel';
 import './CodeEditor.css';
 
-const CodeEditor = ({ appTheme = 'tokyo-night', onAppThemeChange, isGuest = false }) => {
+const CodeEditor = ({ appTheme = 'tokyo-night', onAppThemeChange, isGuest = false, userEmail = '' }) => {
   // File management
   const [openFiles, setOpenFiles] = useState([
     { 
@@ -50,14 +52,22 @@ HLT              ; Halt execution`,
   const dragStartYRef = useRef(0);
   const dragStartHeightRef = useRef(0);
   const [tourState, setTourState] = useState({ run: false, startIndex: 0, key: 0 });
+  const [cloudModalConfig, setCloudModalConfig] = useState({ isOpen: false, mode: 'load' });
+  const [isAIPanelOpen, setIsAIPanelOpen] = useState(false);
 
-  // Auto-trigger tour for guests
+  // Auto-trigger tour for guests vs users
   useEffect(() => {
     if (isGuest) {
       // Small delay helps UI settle
       setTimeout(() => setTourState(prev => ({ run: true, startIndex: 0, key: prev.key + 1 })), 500);
+    } else if (userEmail) {
+      const seenKey = `opsis-tour-seen-${userEmail}`;
+      if (!localStorage.getItem(seenKey)) {
+         localStorage.setItem(seenKey, 'true');
+         setTimeout(() => setTourState(prev => ({ run: true, startIndex: 0, key: prev.key + 1 })), 500);
+      }
     }
-  }, [isGuest]);
+  }, [isGuest, userEmail]);
 
   // Panel resize handlers
   const handlePanelDragStart = useCallback((e) => {
@@ -123,6 +133,11 @@ HLT              ; Halt execution`,
 
   // File operations
   const handleOpenFile = async () => {
+    if (!isGuest && userEmail) {
+      setCloudModalConfig({ isOpen: true, mode: 'load' });
+      return;
+    }
+
     if (window.electronAPI) {
       const file = await window.electronAPI.openFile();
       if (file) {
@@ -133,11 +148,11 @@ HLT              ; Halt execution`,
           ...file,
           language: detectedLang,
           isModified: false,
-          isNew: false
+          isNew: false,
+          isCloudFile: false
         };
 
-        // Check if file is already open
-        const existingIndex = openFiles.findIndex(f => f.path === file.path);
+        const existingIndex = openFiles.findIndex(f => f.path === file.path && !f.isCloudFile);
         if (existingIndex !== -1) {
           setActiveFileIndex(existingIndex);
         } else {
@@ -153,6 +168,16 @@ HLT              ; Halt execution`,
   const handleSaveFile = async () => {
     if (!currentFile) return;
     
+    if (!isGuest && userEmail) {
+      if (currentFile.isCloudFile && currentFile.name && !currentFile.name.startsWith('untitled_')) {
+        // Just trigger save modal securely
+        setCloudModalConfig({ isOpen: true, mode: 'save' });
+      } else {
+        handleSaveFileAs();
+      }
+      return;
+    }
+
     if (window.electronAPI) {
       if (currentFile.path) {
         const result = await window.electronAPI.saveFile({ 
@@ -169,8 +194,14 @@ HLT              ; Halt execution`,
   };
 
   const handleSaveFileAs = async () => {
-    if (!currentFile || !window.electronAPI) return;
-    
+    if (!currentFile) return;
+
+    if (!isGuest && userEmail) {
+      setCloudModalConfig({ isOpen: true, mode: 'save' });
+      return;
+    }
+
+    if (!window.electronAPI) return;
     const result = await window.electronAPI.saveFileAs({ 
       content: currentFile.content 
     });
@@ -179,9 +210,44 @@ HLT              ; Halt execution`,
       updateCurrentFile({ 
         path: result.path, 
         name: result.name,
-        isModified: false 
+        isModified: false,
+        isCloudFile: false
       });
     }
+  };
+
+  const handleCloudLoadComplete = (fileData) => {
+    setCloudModalConfig({ isOpen: false, mode: 'load' });
+    const newFile = {
+      name: fileData.name,
+      content: fileData.content,
+      language: fileData.language || 'assembly',
+      path: null,
+      isCloudFile: true,
+      isModified: false,
+      isNew: false
+    };
+
+    const existingIndex = openFiles.findIndex(f => f.name === newFile.name && f.isCloudFile);
+    if (existingIndex !== -1) {
+      updateCurrentFile({ content: newFile.content, isModified: false });
+      setActiveFileIndex(existingIndex);
+    } else {
+      setOpenFiles([...openFiles, newFile]);
+      setActiveFileIndex(openFiles.length);
+    }
+    setLanguage(newFile.language);
+    setOutput('');
+  };
+
+  const handleCloudSaveComplete = (fileName) => {
+    setCloudModalConfig({ isOpen: false, mode: 'save' });
+    updateCurrentFile({ 
+      name: fileName,
+      isCloudFile: true,
+      isModified: false,
+      isNew: false
+    });
   };
 
   // Keep refs up to date so Monaco closures always call the latest version
@@ -391,6 +457,9 @@ HLT`,
         setTourState(prev => ({ run: false, startIndex: 1, key: prev.key + 1 }));
         setTimeout(() => setTourState(prev => ({ ...prev, run: true })), 50);
         break;
+      case 'aiAnalyze':
+        setIsAIPanelOpen(true);
+        break;
       default:
         console.log('Menu action:', action);
     }
@@ -434,6 +503,21 @@ HLT`,
 
   return (
     <div className="vscode-container">
+      <CloudModal 
+        isOpen={cloudModalConfig.isOpen}
+        mode={cloudModalConfig.mode}
+        userEmail={userEmail}
+        currentContent={currentFile?.content || ''}
+        currentFileName={currentFile?.name || ''}
+        onClose={() => setCloudModalConfig({ ...cloudModalConfig, isOpen: false })}
+        onLoadComplete={handleCloudLoadComplete}
+        onSaveComplete={handleCloudSaveComplete}
+      />
+      <AIPanel
+        code={currentFile?.content || ''}
+        isOpen={isAIPanelOpen}
+        onClose={() => setIsAIPanelOpen(false)}
+      />
       <UserGuide 
         key={`tour-${tourState.key}`}
         run={tourState.run} 
@@ -442,7 +526,7 @@ HLT`,
         appTheme={appTheme}
       />
       {/* Top Menu Bar */}
-      <MenuBar onAction={handleMenuAction} />
+      <MenuBar onAction={handleMenuAction} isGuest={isGuest} />
       
       {/* Main Content Area */}
       <div className="vscode-main">
@@ -472,9 +556,8 @@ HLT`,
           <FileTabs 
             files={openFiles}
             activeFile={currentFile}
-            onTabClick={(file) => {
-              const index = openFiles.findIndex(f => f.path === file.path);
-              setActiveFileIndex(index);
+            onTabClick={(file, idx) => {
+              setActiveFileIndex(idx);
             }}
             onTabClose={handleCloseTab}
             onNewFile={handleNewFile}

@@ -9,8 +9,16 @@ lerna-debug.log*
 
 node_modules
 dist
+dist-electron
 dist-ssr
 *.local
+
+# Environment variables — NEVER commit
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +30,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build output
+release/
+out/
