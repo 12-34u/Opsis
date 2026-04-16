@@ -9,10 +9,12 @@ release/
 out/
 *.exe
 
-# Environment variables
+# Environment variables — NEVER commit these
 .env
 .env.local
 .env.*.local
+.env.production
+.env.development
 
 # IDE files
 .vscode/
@@ -24,6 +26,7 @@ out/
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Logs
 logs/
@@ -35,4 +38,7 @@ yarn-error.log*
 # Temporary files
 *.tmp
 *.temp
+
+# Auto-generated docs
 context.md 
+structure.txt
