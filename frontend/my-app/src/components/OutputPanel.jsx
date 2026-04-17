@@ -155,30 +155,6 @@ export default function OutputPanel({
                 </span>
               </div>
 
-              {/* timeline */}
-              <div className="op-tl-wrap">
-                <div className="op-tl" ref={tlRef}>
-                  {steps.map((s, i) => {
-                    const act = i === step, past = step >= 0 && i < step;
-                    const rc = Object.keys(diffRegs(s.before, s.after)).length > 0;
-                    const mc = diffMem(s.before, s.after).length > 0;
-                    const oc = s.output !== null;
-                    return (
-                      <button key={i} className={`op-tl-step ${act ? 'act' : ''} ${past ? 'past' : ''}`}
-                        onClick={() => { setPlaying(false); setStep(i); }} title={s.instruction}>
-                        <span className="op-tl-n">{i + 1}</span>
-                        <span className="op-tl-ins">{s.instruction}</span>
-                        <span className="op-tl-tags">
-                          {rc && <span className="op-tag tag-r">R</span>}
-                          {mc && <span className="op-tag tag-m">M</span>}
-                          {oc && <span className="op-tag tag-o">O</span>}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* ─── step detail ─── */}
               {cur ? (
                 <div className="op-detail">
@@ -249,6 +225,30 @@ export default function OutputPanel({
                   ))}
                 </div>
               )}
+
+              {/* timeline */}
+              <div className="op-tl-wrap">
+                <div className="op-tl" ref={tlRef}>
+                  {steps.map((s, i) => {
+                    const act = i === step, past = step >= 0 && i < step;
+                    const rc = Object.keys(diffRegs(s.before, s.after)).length > 0;
+                    const mc = diffMem(s.before, s.after).length > 0;
+                    const oc = s.output !== null;
+                    return (
+                      <button key={i} className={`op-tl-step ${act ? 'act' : ''} ${past ? 'past' : ''}`}
+                        onClick={() => { setPlaying(false); setStep(i); }} title={s.instruction}>
+                        <span className="op-tl-n">{i + 1}</span>
+                        <span className="op-tl-ins">{s.instruction}</span>
+                        <span className="op-tl-tags">
+                          {rc && <span className="op-tag tag-r">R</span>}
+                          {mc && <span className="op-tag tag-m">M</span>}
+                          {oc && <span className="op-tag tag-o">O</span>}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </>
           ) : null}
         </div>

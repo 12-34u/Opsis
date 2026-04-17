@@ -24,8 +24,8 @@ const LoadingScreen = ({ onLoadComplete }) => {
       <div className="loading-content">
         <div className="loading-logo">
           <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <rect x="10" y="10" width="60" height="60" rx="8" stroke="#569cd6" strokeWidth="3" fill="none"/>
-            <path d="M25 40L35 50L55 30" stroke="#569cd6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+            <rect x="10" y="10" width="60" height="60" rx="8" stroke="currentColor" strokeWidth="3" fill="none"/>
+            <path d="M25 40L35 50L55 30" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
         <h1 className="loading-title">Opsis Code Editor</h1>

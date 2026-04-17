@@ -1,0 +1,647 @@
+{
+  "architecture": "8085",
+  "default_origin": 0,
+  "endianness": "big",
+  "word_size": 8,
+  "address_width": 16,
+  
+  "registers": {
+    "8bit": ["A", "B", "C", "D", "E", "H", "L"],
+    "16bit": ["BC", "DE", "HL", "SP", "PSW"],
+    "special": ["M"],
+    "pairs": {
+      "B": ["B", "C"],
+      "D": ["D", "E"],
+      "H": ["H", "L"],
+      "PSW": ["A", "FLAGS"]
+    }
+  },
+  
+  "register_codes": {
+    "B": 0, "C": 1, "D": 2, "E": 3, "H": 4, "L": 5, "M": 6, "A": 7
+  },
+  
+  "register_pair_codes": {
+    "BC": 0, "B": 0,
+    "DE": 1, "D": 1,
+    "HL": 2, "H": 2,
+    "SP": 3, "PSW": 3
+  },
+  
+  "addressing_modes": ["REG", "REG_PAIR", "IMM8", "IMM16", "ADDR16", "MEMORY_INDIRECT"],
+  
+  "flags": {
+    "S": {"bit": 7, "description": "Sign flag"},
+    "Z": {"bit": 6, "description": "Zero flag"},
+    "AC": {"bit": 4, "description": "Auxiliary carry flag"},
+    "P": {"bit": 2, "description": "Parity flag"},
+    "CY": {"bit": 0, "description": "Carry flag"}
+  },
+  
+  "directives": [
+    "ORG", "EQU", "DB", "DW", "DS", "END", "SET", "IF", "ENDIF", "MACRO", "ENDM"
+  ],
+  
+  "instructions": [
+    {
+      "mnemonic": "MOV",
+      "description": "Move register to register",
+      "variants": [
+        {"id": "MOV_R_R", "operands": ["REG", "REG"], "opcode_template": "01DDDSSS", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "MOV_R_M", "operands": ["REG", "M"], "opcode_template": "01DDD110", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 7},
+        {"id": "MOV_M_R", "operands": ["M", "REG"], "opcode_template": "01110SSS", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "MVI",
+      "description": "Move immediate to register",
+      "variants": [
+        {"id": "MVI_R_IMM8", "operands": ["REG", "IMM8"], "opcode_template": "00DDD110", "encoding": "reg_in_opcode", "byte_width": 2, "timing_cycles": 7},
+        {"id": "MVI_M_IMM8", "operands": ["M", "IMM8"], "opcode": "36", "encoding": "imm8", "byte_width": 2, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "LXI",
+      "description": "Load register pair immediate",
+      "variants": [
+        {"id": "LXI_B", "operands": ["B", "IMM16"], "opcode": "01", "encoding": "imm16", "byte_width": 3, "timing_cycles": 10},
+        {"id": "LXI_D", "operands": ["D", "IMM16"], "opcode": "11", "encoding": "imm16", "byte_width": 3, "timing_cycles": 10},
+        {"id": "LXI_H", "operands": ["H", "IMM16"], "opcode": "21", "encoding": "imm16", "byte_width": 3, "timing_cycles": 10},
+        {"id": "LXI_SP", "operands": ["SP", "IMM16"], "opcode": "31", "encoding": "imm16", "byte_width": 3, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "LDA",
+      "description": "Load accumulator direct",
+      "variants": [
+        {"id": "LDA", "operands": ["ADDR16"], "opcode": "3A", "encoding": "addr16", "byte_width": 3, "timing_cycles": 13}
+      ]
+    },
+    {
+      "mnemonic": "STA",
+      "description": "Store accumulator direct",
+      "variants": [
+        {"id": "STA", "operands": ["ADDR16"], "opcode": "32", "encoding": "addr16", "byte_width": 3, "timing_cycles": 13}
+      ]
+    },
+    {
+      "mnemonic": "LHLD",
+      "description": "Load H and L direct",
+      "variants": [
+        {"id": "LHLD", "operands": ["ADDR16"], "opcode": "2A", "encoding": "addr16", "byte_width": 3, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "SHLD",
+      "description": "Store H and L direct",
+      "variants": [
+        {"id": "SHLD", "operands": ["ADDR16"], "opcode": "22", "encoding": "addr16", "byte_width": 3, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "LDAX",
+      "description": "Load accumulator indirect",
+      "variants": [
+        {"id": "LDAX_B", "operands": ["B"], "opcode": "0A", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7},
+        {"id": "LDAX_D", "operands": ["D"], "opcode": "1A", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "STAX",
+      "description": "Store accumulator indirect",
+      "variants": [
+        {"id": "STAX_B", "operands": ["B"], "opcode": "02", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7},
+        {"id": "STAX_D", "operands": ["D"], "opcode": "12", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "XCHG",
+      "description": "Exchange D and E, H and L registers",
+      "variants": [
+        {"id": "XCHG", "operands": [], "opcode": "EB", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "ADD",
+      "description": "Add register to accumulator",
+      "variants": [
+        {"id": "ADD_R", "operands": ["REG"], "opcode_template": "10000SSS", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "ADD_M", "operands": ["M"], "opcode": "86", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "ADI",
+      "description": "Add immediate to accumulator",
+      "variants": [
+        {"id": "ADI", "operands": ["IMM8"], "opcode": "C6", "encoding": "imm8", "byte_width": 2, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "ADC",
+      "description": "Add register to accumulator with carry",
+      "variants": [
+        {"id": "ADC_R", "operands": ["REG"], "opcode_template": "10001SSS", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "ADC_M", "operands": ["M"], "opcode": "8E", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "ACI",
+      "description": "Add immediate to accumulator with carry",
+      "variants": [
+        {"id": "ACI", "operands": ["IMM8"], "opcode": "CE", "encoding": "imm8", "byte_width": 2, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "SUB",
+      "description": "Subtract register from accumulator",
+      "variants": [
+        {"id": "SUB_R", "operands": ["REG"], "opcode_template": "10010SSS", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "SUB_M", "operands": ["M"], "opcode": "96", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "SUI",
+      "description": "Subtract immediate from accumulator",
+      "variants": [
+        {"id": "SUI", "operands": ["IMM8"], "opcode": "D6", "encoding": "imm8", "byte_width": 2, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "SBB",
+      "description": "Subtract register from accumulator with borrow",
+      "variants": [
+        {"id": "SBB_R", "operands": ["REG"], "opcode_template": "10011SSS", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "SBB_M", "operands": ["M"], "opcode": "9E", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "SBI",
+      "description": "Subtract immediate from accumulator with borrow",
+      "variants": [
+        {"id": "SBI", "operands": ["IMM8"], "opcode": "DE", "encoding": "imm8", "byte_width": 2, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "INR",
+      "description": "Increment register",
+      "variants": [
+        {"id": "INR_R", "operands": ["REG"], "opcode_template": "00DDD100", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "INR_M", "operands": ["M"], "opcode": "34", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "DCR",
+      "description": "Decrement register",
+      "variants": [
+        {"id": "DCR_R", "operands": ["REG"], "opcode_template": "00DDD101", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "DCR_M", "operands": ["M"], "opcode": "35", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "INX",
+      "description": "Increment register pair",
+      "variants": [
+        {"id": "INX_B", "operands": ["B"], "opcode": "03", "encoding": "fixed", "byte_width": 1, "timing_cycles": 6},
+        {"id": "INX_D", "operands": ["D"], "opcode": "13", "encoding": "fixed", "byte_width": 1, "timing_cycles": 6},
+        {"id": "INX_H", "operands": ["H"], "opcode": "23", "encoding": "fixed", "byte_width": 1, "timing_cycles": 6},
+        {"id": "INX_SP", "operands": ["SP"], "opcode": "33", "encoding": "fixed", "byte_width": 1, "timing_cycles": 6}
+      ]
+    },
+    {
+      "mnemonic": "DCX",
+      "description": "Decrement register pair",
+      "variants": [
+        {"id": "DCX_B", "operands": ["B"], "opcode": "0B", "encoding": "fixed", "byte_width": 1, "timing_cycles": 6},
+        {"id": "DCX_D", "operands": ["D"], "opcode": "1B", "encoding": "fixed", "byte_width": 1, "timing_cycles": 6},
+        {"id": "DCX_H", "operands": ["H"], "opcode": "2B", "encoding": "fixed", "byte_width": 1, "timing_cycles": 6},
+        {"id": "DCX_SP", "operands": ["SP"], "opcode": "3B", "encoding": "fixed", "byte_width": 1, "timing_cycles": 6}
+      ]
+    },
+    {
+      "mnemonic": "DAD",
+      "description": "Add register pair to H and L",
+      "variants": [
+        {"id": "DAD_B", "operands": ["B"], "opcode": "09", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10},
+        {"id": "DAD_D", "operands": ["D"], "opcode": "19", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10},
+        {"id": "DAD_H", "operands": ["H"], "opcode": "29", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10},
+        {"id": "DAD_SP", "operands": ["SP"], "opcode": "39", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "DAA",
+      "description": "Decimal adjust accumulator",
+      "variants": [
+        {"id": "DAA", "operands": [], "opcode": "27", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "ANA",
+      "description": "AND register with accumulator",
+      "variants": [
+        {"id": "ANA_R", "operands": ["REG"], "opcode_template": "10100SSS", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "ANA_M", "operands": ["M"], "opcode": "A6", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "ANI",
+      "description": "AND immediate with accumulator",
+      "variants": [
+        {"id": "ANI", "operands": ["IMM8"], "opcode": "E6", "encoding": "imm8", "byte_width": 2, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "ORA",
+      "description": "OR register with accumulator",
+      "variants": [
+        {"id": "ORA_R", "operands": ["REG"], "opcode_template": "10110SSS", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "ORA_M", "operands": ["M"], "opcode": "B6", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "ORI",
+      "description": "OR immediate with accumulator",
+      "variants": [
+        {"id": "ORI", "operands": ["IMM8"], "opcode": "F6", "encoding": "imm8", "byte_width": 2, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "XRA",
+      "description": "XOR register with accumulator",
+      "variants": [
+        {"id": "XRA_R", "operands": ["REG"], "opcode_template": "10101SSS", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "XRA_M", "operands": ["M"], "opcode": "AE", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "XRI",
+      "description": "XOR immediate with accumulator",
+      "variants": [
+        {"id": "XRI", "operands": ["IMM8"], "opcode": "EE", "encoding": "imm8", "byte_width": 2, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "CMP",
+      "description": "Compare register with accumulator",
+      "variants": [
+        {"id": "CMP_R", "operands": ["REG"], "opcode_template": "10111SSS", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 4},
+        {"id": "CMP_M", "operands": ["M"], "opcode": "BE", "encoding": "fixed", "byte_width": 1, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "CPI",
+      "description": "Compare immediate with accumulator",
+      "variants": [
+        {"id": "CPI", "operands": ["IMM8"], "opcode": "FE", "encoding": "imm8", "byte_width": 2, "timing_cycles": 7}
+      ]
+    },
+    {
+      "mnemonic": "RLC",
+      "description": "Rotate accumulator left",
+      "variants": [
+        {"id": "RLC", "operands": [], "opcode": "07", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "RRC",
+      "description": "Rotate accumulator right",
+      "variants": [
+        {"id": "RRC", "operands": [], "opcode": "0F", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "RAL",
+      "description": "Rotate accumulator left through carry",
+      "variants": [
+        {"id": "RAL", "operands": [], "opcode": "17", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "RAR",
+      "description": "Rotate accumulator right through carry",
+      "variants": [
+        {"id": "RAR", "operands": [], "opcode": "1F", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "CMA",
+      "description": "Complement accumulator",
+      "variants": [
+        {"id": "CMA", "operands": [], "opcode": "2F", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "CMC",
+      "description": "Complement carry",
+      "variants": [
+        {"id": "CMC", "operands": [], "opcode": "3F", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "STC",
+      "description": "Set carry",
+      "variants": [
+        {"id": "STC", "operands": [], "opcode": "37", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "JMP",
+      "description": "Jump unconditional",
+      "variants": [
+        {"id": "JMP", "operands": ["ADDR16"], "opcode": "C3", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "JC",
+      "description": "Jump on carry",
+      "variants": [
+        {"id": "JC", "operands": ["ADDR16"], "opcode": "DA", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "JNC",
+      "description": "Jump on no carry",
+      "variants": [
+        {"id": "JNC", "operands": ["ADDR16"], "opcode": "D2", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "JZ",
+      "description": "Jump on zero",
+      "variants": [
+        {"id": "JZ", "operands": ["ADDR16"], "opcode": "CA", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "JNZ",
+      "description": "Jump on not zero",
+      "variants": [
+        {"id": "JNZ", "operands": ["ADDR16"], "opcode": "C2", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "JP",
+      "description": "Jump on positive",
+      "variants": [
+        {"id": "JP", "operands": ["ADDR16"], "opcode": "F2", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "JM",
+      "description": "Jump on minus",
+      "variants": [
+        {"id": "JM", "operands": ["ADDR16"], "opcode": "FA", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "JPE",
+      "description": "Jump on parity even",
+      "variants": [
+        {"id": "JPE", "operands": ["ADDR16"], "opcode": "EA", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "JPO",
+      "description": "Jump on parity odd",
+      "variants": [
+        {"id": "JPO", "operands": ["ADDR16"], "opcode": "E2", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "CALL",
+      "description": "Call unconditional",
+      "variants": [
+        {"id": "CALL", "operands": ["ADDR16"], "opcode": "CD", "encoding": "addr16", "byte_width": 3, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "CC",
+      "description": "Call on carry",
+      "variants": [
+        {"id": "CC", "operands": ["ADDR16"], "opcode": "DC", "encoding": "addr16", "byte_width": 3, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "CNC",
+      "description": "Call on no carry",
+      "variants": [
+        {"id": "CNC", "operands": ["ADDR16"], "opcode": "D4", "encoding": "addr16", "byte_width": 3, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "CZ",
+      "description": "Call on zero",
+      "variants": [
+        {"id": "CZ", "operands": ["ADDR16"], "opcode": "CC", "encoding": "addr16", "byte_width": 3, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "CNZ",
+      "description": "Call on not zero",
+      "variants": [
+        {"id": "CNZ", "operands": ["ADDR16"], "opcode": "C4", "encoding": "addr16", "byte_width": 3, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "CP",
+      "description": "Call on positive",
+      "variants": [
+        {"id": "CP", "operands": ["ADDR16"], "opcode": "F4", "encoding": "addr16", "byte_width": 3, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "CM",
+      "description": "Call on minus",
+      "variants": [
+        {"id": "CM", "operands": ["ADDR16"], "opcode": "FC", "encoding": "addr16", "byte_width": 3, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "CPE",
+      "description": "Call on parity even",
+      "variants": [
+        {"id": "CPE", "operands": ["ADDR16"], "opcode": "EC", "encoding": "addr16", "byte_width": 3, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "CPO",
+      "description": "Call on parity odd",
+      "variants": [
+        {"id": "CPO", "operands": ["ADDR16"], "opcode": "E4", "encoding": "addr16", "byte_width": 3, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "RET",
+      "description": "Return",
+      "variants": [
+        {"id": "RET", "operands": [], "opcode": "C9", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "RC",
+      "description": "Return on carry",
+      "variants": [
+        {"id": "RC", "operands": [], "opcode": "D8", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "RNC",
+      "description": "Return on no carry",
+      "variants": [
+        {"id": "RNC", "operands": [], "opcode": "D0", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "RZ",
+      "description": "Return on zero",
+      "variants": [
+        {"id": "RZ", "operands": [], "opcode": "C8", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "RNZ",
+      "description": "Return on not zero",
+      "variants": [
+        {"id": "RNZ", "operands": [], "opcode": "C0", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "RP",
+      "description": "Return on positive",
+      "variants": [
+        {"id": "RP", "operands": [], "opcode": "F0", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "RM",
+      "description": "Return on minus",
+      "variants": [
+        {"id": "RM", "operands": [], "opcode": "F8", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "RPE",
+      "description": "Return on parity even",
+      "variants": [
+        {"id": "RPE", "operands": [], "opcode": "E8", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "RPO",
+      "description": "Return on parity odd",
+      "variants": [
+        {"id": "RPO", "operands": [], "opcode": "E0", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "RST",
+      "description": "Restart",
+      "variants": [
+        {"id": "RST_0", "operands": ["0"], "opcode": "C7", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12},
+        {"id": "RST_1", "operands": ["1"], "opcode": "CF", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12},
+        {"id": "RST_2", "operands": ["2"], "opcode": "D7", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12},
+        {"id": "RST_3", "operands": ["3"], "opcode": "DF", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12},
+        {"id": "RST_4", "operands": ["4"], "opcode": "E7", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12},
+        {"id": "RST_5", "operands": ["5"], "opcode": "EF", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12},
+        {"id": "RST_6", "operands": ["6"], "opcode": "F7", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12},
+        {"id": "RST_7", "operands": ["7"], "opcode": "FF", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "PCHL",
+      "description": "Load program counter from H and L",
+      "variants": [
+        {"id": "PCHL", "operands": [], "opcode": "E9", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 6}
+      ]
+    },
+    {
+      "mnemonic": "PUSH",
+      "description": "Push register pair on stack",
+      "variants": [
+        {"id": "PUSH_B", "operands": ["B"], "opcode": "C5", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12},
+        {"id": "PUSH_D", "operands": ["D"], "opcode": "D5", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12},
+        {"id": "PUSH_H", "operands": ["H"], "opcode": "E5", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12},
+        {"id": "PUSH_PSW", "operands": ["PSW"], "opcode": "F5", "encoding": "fixed", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "POP",
+      "description": "Pop register pair off stack",
+      "variants": [
+        {"id": "POP_B", "operands": ["B"], "opcode": "C1", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10},
+        {"id": "POP_D", "operands": ["D"], "opcode": "D1", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10},
+        {"id": "POP_H", "operands": ["H"], "opcode": "E1", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10},
+        {"id": "POP_PSW", "operands": ["PSW"], "opcode": "F1", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "XTHL",
+      "description": "Exchange top of stack with H and L",
+      "variants": [
+        {"id": "XTHL", "operands": [], "opcode": "E3", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "SPHL",
+      "description": "Load stack pointer from H and L",
+      "variants": [
+        {"id": "SPHL", "operands": [], "opcode": "F9", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 6}
+      ]
+    },
+    {
+      "mnemonic": "IN",
+      "description": "Input from port",
+      "variants": [
+        {"id": "IN", "operands": ["IMM8"], "opcode": "DB", "encoding": "imm8", "byte_width": 2, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "OUT",
+      "description": "Output to port",
+      "variants": [
+        {"id": "OUT", "operands": ["IMM8"], "opcode": "D3", "encoding": "imm8", "byte_width": 2, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "EI",
+      "description": "Enable interrupts",
+      "variants": [
+        {"id": "EI", "operands": [], "opcode": "FB", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "DI",
+      "description": "Disable interrupts",
+      "variants": [
+        {"id": "DI", "operands": [], "opcode": "F3", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "HLT",
+      "description": "Halt",
+      "variants": [
+        {"id": "HLT", "operands": [], "opcode": "76", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 5}
+      ]
+    },
+    {
+      "mnemonic": "NOP",
+      "description": "No operation",
+      "variants": [
+        {"id": "NOP", "operands": [], "opcode": "00", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "RIM",
+      "description": "Read interrupt mask (8085 only)",
+      "variants": [
+        {"id": "RIM", "operands": [], "opcode": "20", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "SIM",
+      "description": "Set interrupt mask (8085 only)",
+      "variants": [
+        {"id": "SIM", "operands": [], "opcode": "30", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    }
+  ]
+}

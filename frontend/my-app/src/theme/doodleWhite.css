@@ -1,0 +1,199 @@
+/* ══════════════════════════════════════════════
+   Doodle White — Clean, minimal, modern
+   Thick clean black borders · Square techy font
+   ══════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+html[data-app-theme='doodle-white'] {
+  /* ─── Backgrounds ─── */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-sidebar: #fafafa;
+  --bg-hover: #eeeeee;
+  --bg-active: #e4e4e4;
+  --bg-statusbar: #f0f0f0;
+  --bg-menu: #fafafa;
+  --bg-terminal: #ffffff;
+  --bg-tab: #f5f5f5;
+  --bg-tab-active: #ffffff;
+  --bg-input: #ffffff;
+
+  /* ─── Text ─── */
+  --text-primary: #1a1a1a;
+  --text-secondary: #444444;
+  --text-muted: #888888;
+  --text-bright: #000000;
+  --text-warning: #8a6500;
+  --text-error: #c41e3a;
+  --text-success: #1a7f37;
+  --text-info: #0969da;
+
+  /* ─── Accents (muted, clean) ─── */
+  --accent-blue: #0969da;
+  --accent-cyan: #0550ae;
+  --accent-green: #1a7f37;
+  --accent-magenta: #8250df;
+  --accent-orange: #bc4c00;
+  --accent-red: #cf222e;
+  --accent-yellow: #9a6700;
+  --accent-purple: #8250df;
+
+  /* ─── Borders — thick clean black ─── */
+  --border-primary: #1a1a1a;
+  --border-secondary: #d0d0d0;
+  --border-highlight: #000000;
+  --border-color: #1a1a1a;
+
+  /* ─── File States ─── */
+  --file-saved: var(--text-primary);
+  --file-modified: var(--accent-orange);
+  --file-unsaved: var(--accent-cyan);
+  --file-error: var(--accent-red);
+
+  /* ─── Buttons ─── */
+  --btn-primary: #1a1a1a;
+  --btn-primary-hover: #333333;
+  --btn-success: #1a7f37;
+  --btn-success-hover: #2da44e;
+  --btn-danger: #cf222e;
+
+  /* ─── Scrollbar ─── */
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb: #c0c0c0;
+  --scrollbar-thumb-hover: #999999;
+
+  /* ─── Shadows (subtle, flat) ─── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+  /* ─── Text on accent ─── */
+  --text-on-accent: #ffffff;
+
+  /* ─── Overlay / semi-transparent tokens ─── */
+  --overlay-blue: rgba(9, 105, 218, 0.08);
+  --overlay-blue-strong: rgba(9, 105, 218, 0.14);
+  --overlay-blue-border: rgba(9, 105, 218, 0.25);
+  --overlay-orange: rgba(188, 76, 0, 0.06);
+  --overlay-orange-strong: rgba(188, 76, 0, 0.15);
+  --overlay-orange-border: rgba(188, 76, 0, 0.2);
+  --overlay-green: rgba(26, 127, 55, 0.06);
+  --overlay-green-strong: rgba(26, 127, 55, 0.15);
+  --overlay-green-border: rgba(26, 127, 55, 0.2);
+  --overlay-red: rgba(207, 34, 46, 0.08);
+  --overlay-red-border: rgba(207, 34, 46, 0.25);
+  --overlay-purple: rgba(130, 80, 223, 0.1);
+  --overlay-neutral: rgba(0, 0, 0, 0.03);
+  --overlay-neutral-strong: rgba(0, 0, 0, 0.06);
+}
+
+/* ─── Doodle White chrome: thick clean borders, sharp techy font ─── */
+html[data-app-theme='doodle-white'] {
+  font-family: 'JetBrains Mono', 'Space Mono', 'Consolas', 'SF Mono', monospace;
+}
+
+html[data-app-theme='doodle-white'] .menu-bar {
+  border-bottom-width: 2px;
+  border-bottom-color: var(--border-primary);
+}
+
+html[data-app-theme='doodle-white'] .status-bar {
+  border-top-width: 2px;
+  border-top-color: var(--border-primary);
+}
+
+html[data-app-theme='doodle-white'] .file-explorer {
+  border-right-width: 2px;
+  border-right-color: var(--border-primary);
+}
+
+html[data-app-theme='doodle-white'] .activity-bar {
+  border-right-width: 2px;
+  border-right-color: var(--border-primary);
+}
+
+html[data-app-theme='doodle-white'] .op-sidebar {
+  border-left-width: 2px;
+  border-left-color: var(--border-primary);
+}
+
+html[data-app-theme='doodle-white'] .panel-resize-handle {
+  border-top-width: 2px;
+  border-top-color: var(--border-primary);
+}
+
+html[data-app-theme='doodle-white'] .op-tl-step {
+  border-width: 2px;
+  border-color: var(--border-secondary);
+  border-radius: 3px;
+}
+
+html[data-app-theme='doodle-white'] .op-tl-step.act {
+  border-color: var(--accent-blue);
+}
+
+html[data-app-theme='doodle-white'] .op-reg-block {
+  border-width: 1px;
+  border-color: var(--border-secondary);
+  border-radius: 3px;
+}
+
+html[data-app-theme='doodle-white'] .op-controls {
+  border-width: 2px;
+  border-color: var(--border-primary);
+  border-radius: 3px;
+}
+
+html[data-app-theme='doodle-white'] .op-output-block {
+  border-width: 2px;
+  border-color: var(--border-secondary);
+  border-radius: 3px;
+}
+
+html[data-app-theme='doodle-white'] .menu-dropdown {
+  border-width: 2px;
+  border-color: var(--border-primary);
+  border-radius: 4px;
+  box-shadow: var(--shadow-md);
+}
+
+html[data-app-theme='doodle-white'] .file-tab.active {
+  border-bottom: 2px solid var(--accent-blue);
+}
+
+/* Clean text rendering */
+html[data-app-theme='doodle-white'] .app-title {
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+html[data-app-theme='doodle-white'] .op-title {
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+html[data-app-theme='doodle-white'] .explorer-title {
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+html[data-app-theme='doodle-white'] ::selection {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+/* Button with clean sharp style */
+html[data-app-theme='doodle-white'] .menu-button,
+html[data-app-theme='doodle-white'] .activity-btn,
+html[data-app-theme='doodle-white'] .file-tab {
+  border-radius: 2px;
+}
+
+html[data-app-theme='doodle-white'] .primary-btn {
+  color: #ffffff;
+  border-radius: 3px;
+  font-weight: 600;
+}

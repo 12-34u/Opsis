@@ -1,0 +1,1056 @@
+{
+  "architecture": "8086",
+  "default_origin": 0,
+  "endianness": "little",
+  "word_size": 16,
+  "address_width": 20,
+  
+  "registers": {
+    "16bit": ["AX", "BX", "CX", "DX", "SP", "BP", "SI", "DI"],
+    "8bit": ["AL", "AH", "BL", "BH", "CL", "CH", "DL", "DH"],
+    "segment": ["CS", "DS", "ES", "SS"],
+    "special": ["IP", "FLAGS"]
+  },
+  
+  "register_codes": {
+    "AL": 0, "CL": 1, "DL": 2, "BL": 3, "AH": 4, "CH": 5, "DH": 6, "BH": 7,
+    "AX": 0, "CX": 1, "DX": 2, "BX": 3, "SP": 4, "BP": 5, "SI": 6, "DI": 7
+  },
+  
+  "segment_codes": {
+    "ES": 0, "CS": 1, "SS": 2, "DS": 3
+  },
+  
+  "addressing_modes": [
+    "REG8", "REG16", "SREG", "IMM8", "IMM16", "MEM8", "MEM16",
+    "REL8", "REL16", "ADDR16", "LABEL", "PTR16_16"
+  ],
+  
+  "modrm_modes": {
+    "00": {"BX+SI": 0, "BX+DI": 1, "BP+SI": 2, "BP+DI": 3, "SI": 4, "DI": 5, "DIRECT": 6, "BX": 7},
+    "01": {"BX+SI+d8": 0, "BX+DI+d8": 1, "BP+SI+d8": 2, "BP+DI+d8": 3, "SI+d8": 4, "DI+d8": 5, "BP+d8": 6, "BX+d8": 7},
+    "10": {"BX+SI+d16": 0, "BX+DI+d16": 1, "BP+SI+d16": 2, "BP+DI+d16": 3, "SI+d16": 4, "DI+d16": 5, "BP+d16": 6, "BX+d16": 7},
+    "11": "register"
+  },
+  
+  "flags": {
+    "CF": {"bit": 0, "description": "Carry flag"},
+    "PF": {"bit": 2, "description": "Parity flag"},
+    "AF": {"bit": 4, "description": "Auxiliary carry flag"},
+    "ZF": {"bit": 6, "description": "Zero flag"},
+    "SF": {"bit": 7, "description": "Sign flag"},
+    "TF": {"bit": 8, "description": "Trap flag"},
+    "IF": {"bit": 9, "description": "Interrupt enable flag"},
+    "DF": {"bit": 10, "description": "Direction flag"},
+    "OF": {"bit": 11, "description": "Overflow flag"}
+  },
+  
+  "directives": [
+    "ORG", "EQU", "DB", "DW", "DD", "DQ", "DT", "RESB", "RESW", "RESD",
+    "TIMES", "SEGMENT", "ENDS", "PROC", "ENDP", "END", "ASSUME",
+    "MODEL", "STACK", "DATA", "CODE", "PUBLIC", "EXTERN", "EXTRN",
+    "MACRO", "ENDM", "IF", "IFDEF", "IFNDEF", "ELSE", "ENDIF",
+    "ALIGN", "EVEN", "INCLUDE", "GLOBAL", "SECTION", "BITS"
+  ],
+  
+  "instructions": [
+    {
+      "mnemonic": "MOV",
+      "description": "Move data",
+      "variants": [
+        {"id": "MOV_R8_R8", "operands": ["REG8", "REG8"], "opcode": "8A", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 2},
+        {"id": "MOV_R16_R16", "operands": ["REG16", "REG16"], "opcode": "8B", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 2},
+        {"id": "MOV_R8_M8", "operands": ["REG8", "MEM8"], "opcode": "8A", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 8},
+        {"id": "MOV_R16_M16", "operands": ["REG16", "MEM16"], "opcode": "8B", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 8},
+        {"id": "MOV_M8_R8", "operands": ["MEM8", "REG8"], "opcode": "88", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "MOV_M16_R16", "operands": ["MEM16", "REG16"], "opcode": "89", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "MOV_R8_IMM8", "operands": ["REG8", "IMM8"], "opcode": "B0", "encoding": "reg_in_opcode", "byte_width": 2, "timing_cycles": 4},
+        {"id": "MOV_R16_IMM16", "operands": ["REG16", "IMM16"], "opcode": "B8", "encoding": "reg_in_opcode", "byte_width": 3, "timing_cycles": 4},
+        {"id": "MOV_M8_IMM8", "operands": ["MEM8", "IMM8"], "opcode": "C6", "encoding": "ModRM_imm8", "byte_width": 3, "timing_cycles": 10},
+        {"id": "MOV_M16_IMM16", "operands": ["MEM16", "IMM16"], "opcode": "C7", "encoding": "ModRM_imm16", "byte_width": 4, "timing_cycles": 10},
+        {"id": "MOV_AL_MOFFS8", "operands": ["AL", "ADDR16"], "opcode": "A0", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10},
+        {"id": "MOV_AX_MOFFS16", "operands": ["AX", "ADDR16"], "opcode": "A1", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10},
+        {"id": "MOV_MOFFS8_AL", "operands": ["ADDR16", "AL"], "opcode": "A2", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10},
+        {"id": "MOV_MOFFS16_AX", "operands": ["ADDR16", "AX"], "opcode": "A3", "encoding": "addr16", "byte_width": 3, "timing_cycles": 10},
+        {"id": "MOV_SREG_R16", "operands": ["SREG", "REG16"], "opcode": "8E", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 2},
+        {"id": "MOV_R16_SREG", "operands": ["REG16", "SREG"], "opcode": "8C", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 2},
+        {"id": "MOV_SREG_M16", "operands": ["SREG", "MEM16"], "opcode": "8E", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 8},
+        {"id": "MOV_M16_SREG", "operands": ["MEM16", "SREG"], "opcode": "8C", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9}
+      ]
+    },
+    {
+      "mnemonic": "PUSH",
+      "description": "Push onto stack",
+      "variants": [
+        {"id": "PUSH_R16", "operands": ["REG16"], "opcode": "50", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 11},
+        {"id": "PUSH_M16", "operands": ["MEM16"], "opcode": "FF", "encoding": "ModRM", "modrm_reg": 6, "byte_width": 2, "timing_cycles": 16},
+        {"id": "PUSH_SREG_ES", "operands": ["ES"], "opcode": "06", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10},
+        {"id": "PUSH_SREG_CS", "operands": ["CS"], "opcode": "0E", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10},
+        {"id": "PUSH_SREG_SS", "operands": ["SS"], "opcode": "16", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10},
+        {"id": "PUSH_SREG_DS", "operands": ["DS"], "opcode": "1E", "encoding": "fixed", "byte_width": 1, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "POP",
+      "description": "Pop from stack",
+      "variants": [
+        {"id": "POP_R16", "operands": ["REG16"], "opcode": "58", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 8},
+        {"id": "POP_M16", "operands": ["MEM16"], "opcode": "8F", "encoding": "ModRM", "modrm_reg": 0, "byte_width": 2, "timing_cycles": 17},
+        {"id": "POP_SREG_ES", "operands": ["ES"], "opcode": "07", "encoding": "fixed", "byte_width": 1, "timing_cycles": 8},
+        {"id": "POP_SREG_SS", "operands": ["SS"], "opcode": "17", "encoding": "fixed", "byte_width": 1, "timing_cycles": 8},
+        {"id": "POP_SREG_DS", "operands": ["DS"], "opcode": "1F", "encoding": "fixed", "byte_width": 1, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "XCHG",
+      "description": "Exchange data",
+      "variants": [
+        {"id": "XCHG_AX_R16", "operands": ["AX", "REG16"], "opcode": "90", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 3},
+        {"id": "XCHG_R8_R8", "operands": ["REG8", "REG8"], "opcode": "86", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 4},
+        {"id": "XCHG_R16_R16", "operands": ["REG16", "REG16"], "opcode": "87", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 4},
+        {"id": "XCHG_R8_M8", "operands": ["REG8", "MEM8"], "opcode": "86", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 17},
+        {"id": "XCHG_R16_M16", "operands": ["REG16", "MEM16"], "opcode": "87", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 17}
+      ]
+    },
+    {
+      "mnemonic": "LEA",
+      "description": "Load effective address",
+      "variants": [
+        {"id": "LEA_R16_M16", "operands": ["REG16", "MEM16"], "opcode": "8D", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "LDS",
+      "description": "Load pointer to DS",
+      "variants": [
+        {"id": "LDS_R16_M32", "operands": ["REG16", "MEM16"], "opcode": "C5", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "LES",
+      "description": "Load pointer to ES",
+      "variants": [
+        {"id": "LES_R16_M32", "operands": ["REG16", "MEM16"], "opcode": "C4", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "LAHF",
+      "description": "Load AH with flags",
+      "variants": [
+        {"id": "LAHF", "operands": [], "opcode": "9F", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "SAHF",
+      "description": "Store AH into flags",
+      "variants": [
+        {"id": "SAHF", "operands": [], "opcode": "9E", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "PUSHF",
+      "description": "Push flags",
+      "variants": [
+        {"id": "PUSHF", "operands": [], "opcode": "9C", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 10}
+      ]
+    },
+    {
+      "mnemonic": "POPF",
+      "description": "Pop flags",
+      "variants": [
+        {"id": "POPF", "operands": [], "opcode": "9D", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "ADD",
+      "description": "Add",
+      "variants": [
+        {"id": "ADD_R8_R8", "operands": ["REG8", "REG8"], "opcode": "02", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "ADD_R16_R16", "operands": ["REG16", "REG16"], "opcode": "03", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "ADD_R8_M8", "operands": ["REG8", "MEM8"], "opcode": "02", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "ADD_R16_M16", "operands": ["REG16", "MEM16"], "opcode": "03", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "ADD_M8_R8", "operands": ["MEM8", "REG8"], "opcode": "00", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "ADD_M16_R16", "operands": ["MEM16", "REG16"], "opcode": "01", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "ADD_AL_IMM8", "operands": ["AL", "IMM8"], "opcode": "04", "encoding": "imm8", "byte_width": 2, "timing_cycles": 4},
+        {"id": "ADD_AX_IMM16", "operands": ["AX", "IMM16"], "opcode": "05", "encoding": "imm16", "byte_width": 3, "timing_cycles": 4},
+        {"id": "ADD_R8_IMM8", "operands": ["REG8", "IMM8"], "opcode": "80", "encoding": "ModRM_imm8", "modrm_reg": 0, "byte_width": 3, "timing_cycles": 4},
+        {"id": "ADD_R16_IMM16", "operands": ["REG16", "IMM16"], "opcode": "81", "encoding": "ModRM_imm16", "modrm_reg": 0, "byte_width": 4, "timing_cycles": 4},
+        {"id": "ADD_R16_IMM8", "operands": ["REG16", "IMM8"], "opcode": "83", "encoding": "ModRM_imm8", "modrm_reg": 0, "byte_width": 3, "timing_cycles": 4},
+        {"id": "ADD_M8_IMM8", "operands": ["MEM8", "IMM8"], "opcode": "80", "encoding": "ModRM_imm8", "modrm_reg": 0, "byte_width": 3, "timing_cycles": 17},
+        {"id": "ADD_M16_IMM16", "operands": ["MEM16", "IMM16"], "opcode": "81", "encoding": "ModRM_imm16", "modrm_reg": 0, "byte_width": 4, "timing_cycles": 17}
+      ]
+    },
+    {
+      "mnemonic": "ADC",
+      "description": "Add with carry",
+      "variants": [
+        {"id": "ADC_R8_R8", "operands": ["REG8", "REG8"], "opcode": "12", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "ADC_R16_R16", "operands": ["REG16", "REG16"], "opcode": "13", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "ADC_R8_M8", "operands": ["REG8", "MEM8"], "opcode": "12", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "ADC_R16_M16", "operands": ["REG16", "MEM16"], "opcode": "13", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "ADC_M8_R8", "operands": ["MEM8", "REG8"], "opcode": "10", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "ADC_M16_R16", "operands": ["MEM16", "REG16"], "opcode": "11", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "ADC_AL_IMM8", "operands": ["AL", "IMM8"], "opcode": "14", "encoding": "imm8", "byte_width": 2, "timing_cycles": 4},
+        {"id": "ADC_AX_IMM16", "operands": ["AX", "IMM16"], "opcode": "15", "encoding": "imm16", "byte_width": 3, "timing_cycles": 4},
+        {"id": "ADC_R8_IMM8", "operands": ["REG8", "IMM8"], "opcode": "80", "encoding": "ModRM_imm8", "modrm_reg": 2, "byte_width": 3, "timing_cycles": 4},
+        {"id": "ADC_R16_IMM16", "operands": ["REG16", "IMM16"], "opcode": "81", "encoding": "ModRM_imm16", "modrm_reg": 2, "byte_width": 4, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "SUB",
+      "description": "Subtract",
+      "variants": [
+        {"id": "SUB_R8_R8", "operands": ["REG8", "REG8"], "opcode": "2A", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "SUB_R16_R16", "operands": ["REG16", "REG16"], "opcode": "2B", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "SUB_R8_M8", "operands": ["REG8", "MEM8"], "opcode": "2A", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "SUB_R16_M16", "operands": ["REG16", "MEM16"], "opcode": "2B", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "SUB_M8_R8", "operands": ["MEM8", "REG8"], "opcode": "28", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "SUB_M16_R16", "operands": ["MEM16", "REG16"], "opcode": "29", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "SUB_AL_IMM8", "operands": ["AL", "IMM8"], "opcode": "2C", "encoding": "imm8", "byte_width": 2, "timing_cycles": 4},
+        {"id": "SUB_AX_IMM16", "operands": ["AX", "IMM16"], "opcode": "2D", "encoding": "imm16", "byte_width": 3, "timing_cycles": 4},
+        {"id": "SUB_R8_IMM8", "operands": ["REG8", "IMM8"], "opcode": "80", "encoding": "ModRM_imm8", "modrm_reg": 5, "byte_width": 3, "timing_cycles": 4},
+        {"id": "SUB_R16_IMM16", "operands": ["REG16", "IMM16"], "opcode": "81", "encoding": "ModRM_imm16", "modrm_reg": 5, "byte_width": 4, "timing_cycles": 4},
+        {"id": "SUB_R16_IMM8", "operands": ["REG16", "IMM8"], "opcode": "83", "encoding": "ModRM_imm8", "modrm_reg": 5, "byte_width": 3, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "SBB",
+      "description": "Subtract with borrow",
+      "variants": [
+        {"id": "SBB_R8_R8", "operands": ["REG8", "REG8"], "opcode": "1A", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "SBB_R16_R16", "operands": ["REG16", "REG16"], "opcode": "1B", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "SBB_AL_IMM8", "operands": ["AL", "IMM8"], "opcode": "1C", "encoding": "imm8", "byte_width": 2, "timing_cycles": 4},
+        {"id": "SBB_AX_IMM16", "operands": ["AX", "IMM16"], "opcode": "1D", "encoding": "imm16", "byte_width": 3, "timing_cycles": 4},
+        {"id": "SBB_R8_IMM8", "operands": ["REG8", "IMM8"], "opcode": "80", "encoding": "ModRM_imm8", "modrm_reg": 3, "byte_width": 3, "timing_cycles": 4},
+        {"id": "SBB_R16_IMM16", "operands": ["REG16", "IMM16"], "opcode": "81", "encoding": "ModRM_imm16", "modrm_reg": 3, "byte_width": 4, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "INC",
+      "description": "Increment",
+      "variants": [
+        {"id": "INC_R16", "operands": ["REG16"], "opcode": "40", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 2},
+        {"id": "INC_R8", "operands": ["REG8"], "opcode": "FE", "encoding": "ModRM", "modrm_reg": 0, "byte_width": 2, "timing_cycles": 3},
+        {"id": "INC_M8", "operands": ["MEM8"], "opcode": "FE", "encoding": "ModRM", "modrm_reg": 0, "byte_width": 2, "timing_cycles": 15},
+        {"id": "INC_M16", "operands": ["MEM16"], "opcode": "FF", "encoding": "ModRM", "modrm_reg": 0, "byte_width": 2, "timing_cycles": 15}
+      ]
+    },
+    {
+      "mnemonic": "DEC",
+      "description": "Decrement",
+      "variants": [
+        {"id": "DEC_R16", "operands": ["REG16"], "opcode": "48", "encoding": "reg_in_opcode", "byte_width": 1, "timing_cycles": 2},
+        {"id": "DEC_R8", "operands": ["REG8"], "opcode": "FE", "encoding": "ModRM", "modrm_reg": 1, "byte_width": 2, "timing_cycles": 3},
+        {"id": "DEC_M8", "operands": ["MEM8"], "opcode": "FE", "encoding": "ModRM", "modrm_reg": 1, "byte_width": 2, "timing_cycles": 15},
+        {"id": "DEC_M16", "operands": ["MEM16"], "opcode": "FF", "encoding": "ModRM", "modrm_reg": 1, "byte_width": 2, "timing_cycles": 15}
+      ]
+    },
+    {
+      "mnemonic": "NEG",
+      "description": "Negate",
+      "variants": [
+        {"id": "NEG_R8", "operands": ["REG8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 3, "byte_width": 2, "timing_cycles": 3},
+        {"id": "NEG_R16", "operands": ["REG16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 3, "byte_width": 2, "timing_cycles": 3},
+        {"id": "NEG_M8", "operands": ["MEM8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 3, "byte_width": 2, "timing_cycles": 16},
+        {"id": "NEG_M16", "operands": ["MEM16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 3, "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "CMP",
+      "description": "Compare",
+      "variants": [
+        {"id": "CMP_R8_R8", "operands": ["REG8", "REG8"], "opcode": "3A", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "CMP_R16_R16", "operands": ["REG16", "REG16"], "opcode": "3B", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "CMP_R8_M8", "operands": ["REG8", "MEM8"], "opcode": "3A", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "CMP_R16_M16", "operands": ["REG16", "MEM16"], "opcode": "3B", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "CMP_M8_R8", "operands": ["MEM8", "REG8"], "opcode": "38", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "CMP_M16_R16", "operands": ["MEM16", "REG16"], "opcode": "39", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "CMP_AL_IMM8", "operands": ["AL", "IMM8"], "opcode": "3C", "encoding": "imm8", "byte_width": 2, "timing_cycles": 4},
+        {"id": "CMP_AX_IMM16", "operands": ["AX", "IMM16"], "opcode": "3D", "encoding": "imm16", "byte_width": 3, "timing_cycles": 4},
+        {"id": "CMP_R8_IMM8", "operands": ["REG8", "IMM8"], "opcode": "80", "encoding": "ModRM_imm8", "modrm_reg": 7, "byte_width": 3, "timing_cycles": 4},
+        {"id": "CMP_R16_IMM16", "operands": ["REG16", "IMM16"], "opcode": "81", "encoding": "ModRM_imm16", "modrm_reg": 7, "byte_width": 4, "timing_cycles": 4},
+        {"id": "CMP_R16_IMM8", "operands": ["REG16", "IMM8"], "opcode": "83", "encoding": "ModRM_imm8", "modrm_reg": 7, "byte_width": 3, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "MUL",
+      "description": "Unsigned multiply",
+      "variants": [
+        {"id": "MUL_R8", "operands": ["REG8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 77},
+        {"id": "MUL_R16", "operands": ["REG16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 133},
+        {"id": "MUL_M8", "operands": ["MEM8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 83},
+        {"id": "MUL_M16", "operands": ["MEM16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 139}
+      ]
+    },
+    {
+      "mnemonic": "IMUL",
+      "description": "Signed multiply",
+      "variants": [
+        {"id": "IMUL_R8", "operands": ["REG8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 5, "byte_width": 2, "timing_cycles": 98},
+        {"id": "IMUL_R16", "operands": ["REG16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 5, "byte_width": 2, "timing_cycles": 154},
+        {"id": "IMUL_M8", "operands": ["MEM8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 5, "byte_width": 2, "timing_cycles": 104},
+        {"id": "IMUL_M16", "operands": ["MEM16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 5, "byte_width": 2, "timing_cycles": 160}
+      ]
+    },
+    {
+      "mnemonic": "DIV",
+      "description": "Unsigned divide",
+      "variants": [
+        {"id": "DIV_R8", "operands": ["REG8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 6, "byte_width": 2, "timing_cycles": 90},
+        {"id": "DIV_R16", "operands": ["REG16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 6, "byte_width": 2, "timing_cycles": 162},
+        {"id": "DIV_M8", "operands": ["MEM8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 6, "byte_width": 2, "timing_cycles": 96},
+        {"id": "DIV_M16", "operands": ["MEM16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 6, "byte_width": 2, "timing_cycles": 168}
+      ]
+    },
+    {
+      "mnemonic": "IDIV",
+      "description": "Signed divide",
+      "variants": [
+        {"id": "IDIV_R8", "operands": ["REG8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 7, "byte_width": 2, "timing_cycles": 112},
+        {"id": "IDIV_R16", "operands": ["REG16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 7, "byte_width": 2, "timing_cycles": 184},
+        {"id": "IDIV_M8", "operands": ["MEM8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 7, "byte_width": 2, "timing_cycles": 118},
+        {"id": "IDIV_M16", "operands": ["MEM16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 7, "byte_width": 2, "timing_cycles": 190}
+      ]
+    },
+    {
+      "mnemonic": "CBW",
+      "description": "Convert byte to word",
+      "variants": [
+        {"id": "CBW", "operands": [], "opcode": "98", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "CWD",
+      "description": "Convert word to doubleword",
+      "variants": [
+        {"id": "CWD", "operands": [], "opcode": "99", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 5}
+      ]
+    },
+    {
+      "mnemonic": "DAA",
+      "description": "Decimal adjust after addition",
+      "variants": [
+        {"id": "DAA", "operands": [], "opcode": "27", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "DAS",
+      "description": "Decimal adjust after subtraction",
+      "variants": [
+        {"id": "DAS", "operands": [], "opcode": "2F", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "AAA",
+      "description": "ASCII adjust after addition",
+      "variants": [
+        {"id": "AAA", "operands": [], "opcode": "37", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "AAS",
+      "description": "ASCII adjust after subtraction",
+      "variants": [
+        {"id": "AAS", "operands": [], "opcode": "3F", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "AAM",
+      "description": "ASCII adjust after multiply",
+      "variants": [
+        {"id": "AAM", "operands": [], "opcode": "D4", "encoding": "imm8", "byte_width": 2, "implicit_operand": 10, "timing_cycles": 83}
+      ]
+    },
+    {
+      "mnemonic": "AAD",
+      "description": "ASCII adjust before division",
+      "variants": [
+        {"id": "AAD", "operands": [], "opcode": "D5", "encoding": "imm8", "byte_width": 2, "implicit_operand": 10, "timing_cycles": 60}
+      ]
+    },
+    {
+      "mnemonic": "AND",
+      "description": "Logical AND",
+      "variants": [
+        {"id": "AND_R8_R8", "operands": ["REG8", "REG8"], "opcode": "22", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "AND_R16_R16", "operands": ["REG16", "REG16"], "opcode": "23", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "AND_R8_M8", "operands": ["REG8", "MEM8"], "opcode": "22", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "AND_R16_M16", "operands": ["REG16", "MEM16"], "opcode": "23", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "AND_M8_R8", "operands": ["MEM8", "REG8"], "opcode": "20", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "AND_M16_R16", "operands": ["MEM16", "REG16"], "opcode": "21", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "AND_AL_IMM8", "operands": ["AL", "IMM8"], "opcode": "24", "encoding": "imm8", "byte_width": 2, "timing_cycles": 4},
+        {"id": "AND_AX_IMM16", "operands": ["AX", "IMM16"], "opcode": "25", "encoding": "imm16", "byte_width": 3, "timing_cycles": 4},
+        {"id": "AND_R8_IMM8", "operands": ["REG8", "IMM8"], "opcode": "80", "encoding": "ModRM_imm8", "modrm_reg": 4, "byte_width": 3, "timing_cycles": 4},
+        {"id": "AND_R16_IMM16", "operands": ["REG16", "IMM16"], "opcode": "81", "encoding": "ModRM_imm16", "modrm_reg": 4, "byte_width": 4, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "OR",
+      "description": "Logical OR",
+      "variants": [
+        {"id": "OR_R8_R8", "operands": ["REG8", "REG8"], "opcode": "0A", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "OR_R16_R16", "operands": ["REG16", "REG16"], "opcode": "0B", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "OR_R8_M8", "operands": ["REG8", "MEM8"], "opcode": "0A", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "OR_R16_M16", "operands": ["REG16", "MEM16"], "opcode": "0B", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "OR_M8_R8", "operands": ["MEM8", "REG8"], "opcode": "08", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "OR_M16_R16", "operands": ["MEM16", "REG16"], "opcode": "09", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "OR_AL_IMM8", "operands": ["AL", "IMM8"], "opcode": "0C", "encoding": "imm8", "byte_width": 2, "timing_cycles": 4},
+        {"id": "OR_AX_IMM16", "operands": ["AX", "IMM16"], "opcode": "0D", "encoding": "imm16", "byte_width": 3, "timing_cycles": 4},
+        {"id": "OR_R8_IMM8", "operands": ["REG8", "IMM8"], "opcode": "80", "encoding": "ModRM_imm8", "modrm_reg": 1, "byte_width": 3, "timing_cycles": 4},
+        {"id": "OR_R16_IMM16", "operands": ["REG16", "IMM16"], "opcode": "81", "encoding": "ModRM_imm16", "modrm_reg": 1, "byte_width": 4, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "XOR",
+      "description": "Logical XOR",
+      "variants": [
+        {"id": "XOR_R8_R8", "operands": ["REG8", "REG8"], "opcode": "32", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "XOR_R16_R16", "operands": ["REG16", "REG16"], "opcode": "33", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "XOR_R8_M8", "operands": ["REG8", "MEM8"], "opcode": "32", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "XOR_R16_M16", "operands": ["REG16", "MEM16"], "opcode": "33", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 9},
+        {"id": "XOR_M8_R8", "operands": ["MEM8", "REG8"], "opcode": "30", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "XOR_M16_R16", "operands": ["MEM16", "REG16"], "opcode": "31", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 16},
+        {"id": "XOR_AL_IMM8", "operands": ["AL", "IMM8"], "opcode": "34", "encoding": "imm8", "byte_width": 2, "timing_cycles": 4},
+        {"id": "XOR_AX_IMM16", "operands": ["AX", "IMM16"], "opcode": "35", "encoding": "imm16", "byte_width": 3, "timing_cycles": 4},
+        {"id": "XOR_R8_IMM8", "operands": ["REG8", "IMM8"], "opcode": "80", "encoding": "ModRM_imm8", "modrm_reg": 6, "byte_width": 3, "timing_cycles": 4},
+        {"id": "XOR_R16_IMM16", "operands": ["REG16", "IMM16"], "opcode": "81", "encoding": "ModRM_imm16", "modrm_reg": 6, "byte_width": 4, "timing_cycles": 4}
+      ]
+    },
+    {
+      "mnemonic": "NOT",
+      "description": "Logical NOT",
+      "variants": [
+        {"id": "NOT_R8", "operands": ["REG8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 2, "byte_width": 2, "timing_cycles": 3},
+        {"id": "NOT_R16", "operands": ["REG16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 2, "byte_width": 2, "timing_cycles": 3},
+        {"id": "NOT_M8", "operands": ["MEM8"], "opcode": "F6", "encoding": "ModRM", "modrm_reg": 2, "byte_width": 2, "timing_cycles": 16},
+        {"id": "NOT_M16", "operands": ["MEM16"], "opcode": "F7", "encoding": "ModRM", "modrm_reg": 2, "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "TEST",
+      "description": "Test (AND without storing)",
+      "variants": [
+        {"id": "TEST_R8_R8", "operands": ["REG8", "REG8"], "opcode": "84", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "TEST_R16_R16", "operands": ["REG16", "REG16"], "opcode": "85", "encoding": "ModRM", "byte_width": 2, "timing_cycles": 3},
+        {"id": "TEST_AL_IMM8", "operands": ["AL", "IMM8"], "opcode": "A8", "encoding": "imm8", "byte_width": 2, "timing_cycles": 4},
+        {"id": "TEST_AX_IMM16", "operands": ["AX", "IMM16"], "opcode": "A9", "encoding": "imm16", "byte_width": 3, "timing_cycles": 4},
+        {"id": "TEST_R8_IMM8", "operands": ["REG8", "IMM8"], "opcode": "F6", "encoding": "ModRM_imm8", "modrm_reg": 0, "byte_width": 3, "timing_cycles": 5},
+        {"id": "TEST_R16_IMM16", "operands": ["REG16", "IMM16"], "opcode": "F7", "encoding": "ModRM_imm16", "modrm_reg": 0, "byte_width": 4, "timing_cycles": 5}
+      ]
+    },
+    {
+      "mnemonic": "SHL",
+      "description": "Shift left",
+      "variants": [
+        {"id": "SHL_R8_1", "operands": ["REG8", "1"], "opcode": "D0", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 2},
+        {"id": "SHL_R16_1", "operands": ["REG16", "1"], "opcode": "D1", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 2},
+        {"id": "SHL_R8_CL", "operands": ["REG8", "CL"], "opcode": "D2", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 8},
+        {"id": "SHL_R16_CL", "operands": ["REG16", "CL"], "opcode": "D3", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "SAL",
+      "description": "Shift arithmetic left (same as SHL)",
+      "variants": [
+        {"id": "SAL_R8_1", "operands": ["REG8", "1"], "opcode": "D0", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 2},
+        {"id": "SAL_R16_1", "operands": ["REG16", "1"], "opcode": "D1", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 2},
+        {"id": "SAL_R8_CL", "operands": ["REG8", "CL"], "opcode": "D2", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 8},
+        {"id": "SAL_R16_CL", "operands": ["REG16", "CL"], "opcode": "D3", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "SHR",
+      "description": "Shift right",
+      "variants": [
+        {"id": "SHR_R8_1", "operands": ["REG8", "1"], "opcode": "D0", "encoding": "ModRM", "modrm_reg": 5, "byte_width": 2, "timing_cycles": 2},
+        {"id": "SHR_R16_1", "operands": ["REG16", "1"], "opcode": "D1", "encoding": "ModRM", "modrm_reg": 5, "byte_width": 2, "timing_cycles": 2},
+        {"id": "SHR_R8_CL", "operands": ["REG8", "CL"], "opcode": "D2", "encoding": "ModRM", "modrm_reg": 5, "byte_width": 2, "timing_cycles": 8},
+        {"id": "SHR_R16_CL", "operands": ["REG16", "CL"], "opcode": "D3", "encoding": "ModRM", "modrm_reg": 5, "byte_width": 2, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "SAR",
+      "description": "Shift arithmetic right",
+      "variants": [
+        {"id": "SAR_R8_1", "operands": ["REG8", "1"], "opcode": "D0", "encoding": "ModRM", "modrm_reg": 7, "byte_width": 2, "timing_cycles": 2},
+        {"id": "SAR_R16_1", "operands": ["REG16", "1"], "opcode": "D1", "encoding": "ModRM", "modrm_reg": 7, "byte_width": 2, "timing_cycles": 2},
+        {"id": "SAR_R8_CL", "operands": ["REG8", "CL"], "opcode": "D2", "encoding": "ModRM", "modrm_reg": 7, "byte_width": 2, "timing_cycles": 8},
+        {"id": "SAR_R16_CL", "operands": ["REG16", "CL"], "opcode": "D3", "encoding": "ModRM", "modrm_reg": 7, "byte_width": 2, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "ROL",
+      "description": "Rotate left",
+      "variants": [
+        {"id": "ROL_R8_1", "operands": ["REG8", "1"], "opcode": "D0", "encoding": "ModRM", "modrm_reg": 0, "byte_width": 2, "timing_cycles": 2},
+        {"id": "ROL_R16_1", "operands": ["REG16", "1"], "opcode": "D1", "encoding": "ModRM", "modrm_reg": 0, "byte_width": 2, "timing_cycles": 2},
+        {"id": "ROL_R8_CL", "operands": ["REG8", "CL"], "opcode": "D2", "encoding": "ModRM", "modrm_reg": 0, "byte_width": 2, "timing_cycles": 8},
+        {"id": "ROL_R16_CL", "operands": ["REG16", "CL"], "opcode": "D3", "encoding": "ModRM", "modrm_reg": 0, "byte_width": 2, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "ROR",
+      "description": "Rotate right",
+      "variants": [
+        {"id": "ROR_R8_1", "operands": ["REG8", "1"], "opcode": "D0", "encoding": "ModRM", "modrm_reg": 1, "byte_width": 2, "timing_cycles": 2},
+        {"id": "ROR_R16_1", "operands": ["REG16", "1"], "opcode": "D1", "encoding": "ModRM", "modrm_reg": 1, "byte_width": 2, "timing_cycles": 2},
+        {"id": "ROR_R8_CL", "operands": ["REG8", "CL"], "opcode": "D2", "encoding": "ModRM", "modrm_reg": 1, "byte_width": 2, "timing_cycles": 8},
+        {"id": "ROR_R16_CL", "operands": ["REG16", "CL"], "opcode": "D3", "encoding": "ModRM", "modrm_reg": 1, "byte_width": 2, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "RCL",
+      "description": "Rotate left through carry",
+      "variants": [
+        {"id": "RCL_R8_1", "operands": ["REG8", "1"], "opcode": "D0", "encoding": "ModRM", "modrm_reg": 2, "byte_width": 2, "timing_cycles": 2},
+        {"id": "RCL_R16_1", "operands": ["REG16", "1"], "opcode": "D1", "encoding": "ModRM", "modrm_reg": 2, "byte_width": 2, "timing_cycles": 2},
+        {"id": "RCL_R8_CL", "operands": ["REG8", "CL"], "opcode": "D2", "encoding": "ModRM", "modrm_reg": 2, "byte_width": 2, "timing_cycles": 8},
+        {"id": "RCL_R16_CL", "operands": ["REG16", "CL"], "opcode": "D3", "encoding": "ModRM", "modrm_reg": 2, "byte_width": 2, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "RCR",
+      "description": "Rotate right through carry",
+      "variants": [
+        {"id": "RCR_R8_1", "operands": ["REG8", "1"], "opcode": "D0", "encoding": "ModRM", "modrm_reg": 3, "byte_width": 2, "timing_cycles": 2},
+        {"id": "RCR_R16_1", "operands": ["REG16", "1"], "opcode": "D1", "encoding": "ModRM", "modrm_reg": 3, "byte_width": 2, "timing_cycles": 2},
+        {"id": "RCR_R8_CL", "operands": ["REG8", "CL"], "opcode": "D2", "encoding": "ModRM", "modrm_reg": 3, "byte_width": 2, "timing_cycles": 8},
+        {"id": "RCR_R16_CL", "operands": ["REG16", "CL"], "opcode": "D3", "encoding": "ModRM", "modrm_reg": 3, "byte_width": 2, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "JMP",
+      "description": "Unconditional jump",
+      "variants": [
+        {"id": "JMP_REL8", "operands": ["REL8"], "opcode": "EB", "encoding": "rel8", "byte_width": 2, "timing_cycles": 15},
+        {"id": "JMP_REL16", "operands": ["REL16"], "opcode": "E9", "encoding": "rel16", "byte_width": 3, "timing_cycles": 15},
+        {"id": "JMP_R16", "operands": ["REG16"], "opcode": "FF", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 11},
+        {"id": "JMP_M16", "operands": ["MEM16"], "opcode": "FF", "encoding": "ModRM", "modrm_reg": 4, "byte_width": 2, "timing_cycles": 18},
+        {"id": "JMP_PTR16_16", "operands": ["PTR16_16"], "opcode": "EA", "encoding": "ptr16_16", "byte_width": 5, "timing_cycles": 15}
+      ]
+    },
+    {
+      "mnemonic": "JE",
+      "description": "Jump if equal (ZF=1)",
+      "variants": [
+        {"id": "JE_REL8", "operands": ["REL8"], "opcode": "74", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JZ",
+      "description": "Jump if zero (ZF=1)",
+      "variants": [
+        {"id": "JZ_REL8", "operands": ["REL8"], "opcode": "74", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNE",
+      "description": "Jump if not equal (ZF=0)",
+      "variants": [
+        {"id": "JNE_REL8", "operands": ["REL8"], "opcode": "75", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNZ",
+      "description": "Jump if not zero (ZF=0)",
+      "variants": [
+        {"id": "JNZ_REL8", "operands": ["REL8"], "opcode": "75", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JG",
+      "description": "Jump if greater (ZF=0 and SF=OF)",
+      "variants": [
+        {"id": "JG_REL8", "operands": ["REL8"], "opcode": "7F", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNLE",
+      "description": "Jump if not less or equal",
+      "variants": [
+        {"id": "JNLE_REL8", "operands": ["REL8"], "opcode": "7F", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JGE",
+      "description": "Jump if greater or equal (SF=OF)",
+      "variants": [
+        {"id": "JGE_REL8", "operands": ["REL8"], "opcode": "7D", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNL",
+      "description": "Jump if not less",
+      "variants": [
+        {"id": "JNL_REL8", "operands": ["REL8"], "opcode": "7D", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JL",
+      "description": "Jump if less (SF!=OF)",
+      "variants": [
+        {"id": "JL_REL8", "operands": ["REL8"], "opcode": "7C", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNGE",
+      "description": "Jump if not greater or equal",
+      "variants": [
+        {"id": "JNGE_REL8", "operands": ["REL8"], "opcode": "7C", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JLE",
+      "description": "Jump if less or equal (ZF=1 or SF!=OF)",
+      "variants": [
+        {"id": "JLE_REL8", "operands": ["REL8"], "opcode": "7E", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNG",
+      "description": "Jump if not greater",
+      "variants": [
+        {"id": "JNG_REL8", "operands": ["REL8"], "opcode": "7E", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JA",
+      "description": "Jump if above (CF=0 and ZF=0)",
+      "variants": [
+        {"id": "JA_REL8", "operands": ["REL8"], "opcode": "77", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNBE",
+      "description": "Jump if not below or equal",
+      "variants": [
+        {"id": "JNBE_REL8", "operands": ["REL8"], "opcode": "77", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JAE",
+      "description": "Jump if above or equal (CF=0)",
+      "variants": [
+        {"id": "JAE_REL8", "operands": ["REL8"], "opcode": "73", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNB",
+      "description": "Jump if not below",
+      "variants": [
+        {"id": "JNB_REL8", "operands": ["REL8"], "opcode": "73", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNC",
+      "description": "Jump if no carry (CF=0)",
+      "variants": [
+        {"id": "JNC_REL8", "operands": ["REL8"], "opcode": "73", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JB",
+      "description": "Jump if below (CF=1)",
+      "variants": [
+        {"id": "JB_REL8", "operands": ["REL8"], "opcode": "72", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNAE",
+      "description": "Jump if not above or equal",
+      "variants": [
+        {"id": "JNAE_REL8", "operands": ["REL8"], "opcode": "72", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JC",
+      "description": "Jump if carry (CF=1)",
+      "variants": [
+        {"id": "JC_REL8", "operands": ["REL8"], "opcode": "72", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JBE",
+      "description": "Jump if below or equal (CF=1 or ZF=1)",
+      "variants": [
+        {"id": "JBE_REL8", "operands": ["REL8"], "opcode": "76", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNA",
+      "description": "Jump if not above",
+      "variants": [
+        {"id": "JNA_REL8", "operands": ["REL8"], "opcode": "76", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JS",
+      "description": "Jump if sign (SF=1)",
+      "variants": [
+        {"id": "JS_REL8", "operands": ["REL8"], "opcode": "78", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNS",
+      "description": "Jump if not sign (SF=0)",
+      "variants": [
+        {"id": "JNS_REL8", "operands": ["REL8"], "opcode": "79", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JO",
+      "description": "Jump if overflow (OF=1)",
+      "variants": [
+        {"id": "JO_REL8", "operands": ["REL8"], "opcode": "70", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNO",
+      "description": "Jump if not overflow (OF=0)",
+      "variants": [
+        {"id": "JNO_REL8", "operands": ["REL8"], "opcode": "71", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JP",
+      "description": "Jump if parity (PF=1)",
+      "variants": [
+        {"id": "JP_REL8", "operands": ["REL8"], "opcode": "7A", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JPE",
+      "description": "Jump if parity even",
+      "variants": [
+        {"id": "JPE_REL8", "operands": ["REL8"], "opcode": "7A", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JNP",
+      "description": "Jump if no parity (PF=0)",
+      "variants": [
+        {"id": "JNP_REL8", "operands": ["REL8"], "opcode": "7B", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JPO",
+      "description": "Jump if parity odd",
+      "variants": [
+        {"id": "JPO_REL8", "operands": ["REL8"], "opcode": "7B", "encoding": "rel8", "byte_width": 2, "timing_cycles": 16}
+      ]
+    },
+    {
+      "mnemonic": "JCXZ",
+      "description": "Jump if CX is zero",
+      "variants": [
+        {"id": "JCXZ_REL8", "operands": ["REL8"], "opcode": "E3", "encoding": "rel8", "byte_width": 2, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "LOOP",
+      "description": "Loop (decrement CX, jump if CX!=0)",
+      "variants": [
+        {"id": "LOOP_REL8", "operands": ["REL8"], "opcode": "E2", "encoding": "rel8", "byte_width": 2, "timing_cycles": 17}
+      ]
+    },
+    {
+      "mnemonic": "LOOPE",
+      "description": "Loop while equal",
+      "variants": [
+        {"id": "LOOPE_REL8", "operands": ["REL8"], "opcode": "E1", "encoding": "rel8", "byte_width": 2, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "LOOPZ",
+      "description": "Loop while zero",
+      "variants": [
+        {"id": "LOOPZ_REL8", "operands": ["REL8"], "opcode": "E1", "encoding": "rel8", "byte_width": 2, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "LOOPNE",
+      "description": "Loop while not equal",
+      "variants": [
+        {"id": "LOOPNE_REL8", "operands": ["REL8"], "opcode": "E0", "encoding": "rel8", "byte_width": 2, "timing_cycles": 19}
+      ]
+    },
+    {
+      "mnemonic": "LOOPNZ",
+      "description": "Loop while not zero",
+      "variants": [
+        {"id": "LOOPNZ_REL8", "operands": ["REL8"], "opcode": "E0", "encoding": "rel8", "byte_width": 2, "timing_cycles": 19}
+      ]
+    },
+    {
+      "mnemonic": "CALL",
+      "description": "Call procedure",
+      "variants": [
+        {"id": "CALL_REL16", "operands": ["REL16"], "opcode": "E8", "encoding": "rel16", "byte_width": 3, "timing_cycles": 19},
+        {"id": "CALL_R16", "operands": ["REG16"], "opcode": "FF", "encoding": "ModRM", "modrm_reg": 2, "byte_width": 2, "timing_cycles": 16},
+        {"id": "CALL_M16", "operands": ["MEM16"], "opcode": "FF", "encoding": "ModRM", "modrm_reg": 2, "byte_width": 2, "timing_cycles": 21},
+        {"id": "CALL_PTR16_16", "operands": ["PTR16_16"], "opcode": "9A", "encoding": "ptr16_16", "byte_width": 5, "timing_cycles": 28}
+      ]
+    },
+    {
+      "mnemonic": "RET",
+      "description": "Return from procedure",
+      "variants": [
+        {"id": "RET", "operands": [], "opcode": "C3", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 8},
+        {"id": "RET_IMM16", "operands": ["IMM16"], "opcode": "C2", "encoding": "imm16", "byte_width": 3, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "RETF",
+      "description": "Return far",
+      "variants": [
+        {"id": "RETF", "operands": [], "opcode": "CB", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 18},
+        {"id": "RETF_IMM16", "operands": ["IMM16"], "opcode": "CA", "encoding": "imm16", "byte_width": 3, "timing_cycles": 17}
+      ]
+    },
+    {
+      "mnemonic": "INT",
+      "description": "Interrupt",
+      "variants": [
+        {"id": "INT_IMM8", "operands": ["IMM8"], "opcode": "CD", "encoding": "imm8", "byte_width": 2, "timing_cycles": 51},
+        {"id": "INT_3", "operands": [], "opcode": "CC", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 52}
+      ]
+    },
+    {
+      "mnemonic": "INTO",
+      "description": "Interrupt on overflow",
+      "variants": [
+        {"id": "INTO", "operands": [], "opcode": "CE", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 53}
+      ]
+    },
+    {
+      "mnemonic": "IRET",
+      "description": "Interrupt return",
+      "variants": [
+        {"id": "IRET", "operands": [], "opcode": "CF", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 24}
+      ]
+    },
+    {
+      "mnemonic": "CLC",
+      "description": "Clear carry flag",
+      "variants": [
+        {"id": "CLC", "operands": [], "opcode": "F8", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "STC",
+      "description": "Set carry flag",
+      "variants": [
+        {"id": "STC", "operands": [], "opcode": "F9", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "CMC",
+      "description": "Complement carry flag",
+      "variants": [
+        {"id": "CMC", "operands": [], "opcode": "F5", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "CLD",
+      "description": "Clear direction flag",
+      "variants": [
+        {"id": "CLD", "operands": [], "opcode": "FC", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "STD",
+      "description": "Set direction flag",
+      "variants": [
+        {"id": "STD", "operands": [], "opcode": "FD", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "CLI",
+      "description": "Clear interrupt flag",
+      "variants": [
+        {"id": "CLI", "operands": [], "opcode": "FA", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "STI",
+      "description": "Set interrupt flag",
+      "variants": [
+        {"id": "STI", "operands": [], "opcode": "FB", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "HLT",
+      "description": "Halt",
+      "variants": [
+        {"id": "HLT", "operands": [], "opcode": "F4", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "WAIT",
+      "description": "Wait for coprocessor",
+      "variants": [
+        {"id": "WAIT", "operands": [], "opcode": "9B", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 3}
+      ]
+    },
+    {
+      "mnemonic": "NOP",
+      "description": "No operation",
+      "variants": [
+        {"id": "NOP", "operands": [], "opcode": "90", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 3}
+      ]
+    },
+    {
+      "mnemonic": "LOCK",
+      "description": "Lock bus prefix",
+      "variants": [
+        {"id": "LOCK", "operands": [], "opcode": "F0", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "REP",
+      "description": "Repeat string operation",
+      "variants": [
+        {"id": "REP", "operands": [], "opcode": "F3", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "REPE",
+      "description": "Repeat while equal",
+      "variants": [
+        {"id": "REPE", "operands": [], "opcode": "F3", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "REPZ",
+      "description": "Repeat while zero",
+      "variants": [
+        {"id": "REPZ", "operands": [], "opcode": "F3", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "REPNE",
+      "description": "Repeat while not equal",
+      "variants": [
+        {"id": "REPNE", "operands": [], "opcode": "F2", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "REPNZ",
+      "description": "Repeat while not zero",
+      "variants": [
+        {"id": "REPNZ", "operands": [], "opcode": "F2", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 2}
+      ]
+    },
+    {
+      "mnemonic": "MOVSB",
+      "description": "Move byte string",
+      "variants": [
+        {"id": "MOVSB", "operands": [], "opcode": "A4", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "MOVSW",
+      "description": "Move word string",
+      "variants": [
+        {"id": "MOVSW", "operands": [], "opcode": "A5", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 18}
+      ]
+    },
+    {
+      "mnemonic": "CMPSB",
+      "description": "Compare byte string",
+      "variants": [
+        {"id": "CMPSB", "operands": [], "opcode": "A6", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 22}
+      ]
+    },
+    {
+      "mnemonic": "CMPSW",
+      "description": "Compare word string",
+      "variants": [
+        {"id": "CMPSW", "operands": [], "opcode": "A7", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 22}
+      ]
+    },
+    {
+      "mnemonic": "SCASB",
+      "description": "Scan byte string",
+      "variants": [
+        {"id": "SCASB", "operands": [], "opcode": "AE", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 15}
+      ]
+    },
+    {
+      "mnemonic": "SCASW",
+      "description": "Scan word string",
+      "variants": [
+        {"id": "SCASW", "operands": [], "opcode": "AF", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 15}
+      ]
+    },
+    {
+      "mnemonic": "LODSB",
+      "description": "Load byte string",
+      "variants": [
+        {"id": "LODSB", "operands": [], "opcode": "AC", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "LODSW",
+      "description": "Load word string",
+      "variants": [
+        {"id": "LODSW", "operands": [], "opcode": "AD", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 12}
+      ]
+    },
+    {
+      "mnemonic": "STOSB",
+      "description": "Store byte string",
+      "variants": [
+        {"id": "STOSB", "operands": [], "opcode": "AA", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 11}
+      ]
+    },
+    {
+      "mnemonic": "STOSW",
+      "description": "Store word string",
+      "variants": [
+        {"id": "STOSW", "operands": [], "opcode": "AB", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 11}
+      ]
+    },
+    {
+      "mnemonic": "IN",
+      "description": "Input from port",
+      "variants": [
+        {"id": "IN_AL_IMM8", "operands": ["AL", "IMM8"], "opcode": "E4", "encoding": "imm8", "byte_width": 2, "timing_cycles": 10},
+        {"id": "IN_AX_IMM8", "operands": ["AX", "IMM8"], "opcode": "E5", "encoding": "imm8", "byte_width": 2, "timing_cycles": 10},
+        {"id": "IN_AL_DX", "operands": ["AL", "DX"], "opcode": "EC", "encoding": "fixed", "byte_width": 1, "timing_cycles": 8},
+        {"id": "IN_AX_DX", "operands": ["AX", "DX"], "opcode": "ED", "encoding": "fixed", "byte_width": 1, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "OUT",
+      "description": "Output to port",
+      "variants": [
+        {"id": "OUT_IMM8_AL", "operands": ["IMM8", "AL"], "opcode": "E6", "encoding": "imm8", "byte_width": 2, "timing_cycles": 10},
+        {"id": "OUT_IMM8_AX", "operands": ["IMM8", "AX"], "opcode": "E7", "encoding": "imm8", "byte_width": 2, "timing_cycles": 10},
+        {"id": "OUT_DX_AL", "operands": ["DX", "AL"], "opcode": "EE", "encoding": "fixed", "byte_width": 1, "timing_cycles": 8},
+        {"id": "OUT_DX_AX", "operands": ["DX", "AX"], "opcode": "EF", "encoding": "fixed", "byte_width": 1, "timing_cycles": 8}
+      ]
+    },
+    {
+      "mnemonic": "XLAT",
+      "description": "Table lookup translation",
+      "variants": [
+        {"id": "XLAT", "operands": [], "opcode": "D7", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 11}
+      ]
+    },
+    {
+      "mnemonic": "XLATB",
+      "description": "Table lookup translation (byte)",
+      "variants": [
+        {"id": "XLATB", "operands": [], "opcode": "D7", "encoding": "no_operands", "byte_width": 1, "timing_cycles": 11}
+      ]
+    }
+  ],
+  
+  "segment_prefixes": {
+    "CS": "2E",
+    "DS": "3E",
+    "ES": "26",
+    "SS": "36"
+  }
+}
